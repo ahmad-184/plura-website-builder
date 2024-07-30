@@ -41,21 +41,22 @@ export default async function SidebarMenuOptions({
                 if (icon) val = <icon.path />;
 
                 return (
-                  <CommandItem
-                    key={op.id}
-                    className="md:w-[320px] w-full
-                    aria-selected:bg-primary/90 aria-selected:text-white
-                  "
-                  >
-                    <Link
-                      href={op.link}
-                      className="
-                            hover:bg-transparent flex items-center gap-2 rounded-md transition-all md:w-full w-[320px]
-                        "
+                  <Link href={op.link}>
+                    <CommandItem
+                      key={op.id}
+                      className="md:w-[320px] w-full
+                    aria-selected:bg-primary aria-selected:text-white
+                    "
                     >
-                      {val} <span>{op.name}</span>
-                    </Link>
-                  </CommandItem>
+                      <div
+                        className="
+                          hover:bg-transparent flex items-center gap-2 rounded-md transition-all md:w-full w-[320px]
+                      "
+                      >
+                        {val} <span>{op.name}</span>
+                      </div>
+                    </CommandItem>
+                  </Link>
                 );
               })}
             </CommandGroup>

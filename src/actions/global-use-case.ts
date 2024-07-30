@@ -83,3 +83,13 @@ export const getSidebarOptions = async (type: SidebarType, id: string) => {
 
   return options;
 };
+
+export const getAgencyOrSubAccount = async (type: SidebarType, id: string) => {
+  let data;
+
+  if (type === "agency") data = await db.agency.findUnique({ where: { id } });
+  if (type === "subaccount")
+    data = await db.subAccount.findUnique({ where: { id } });
+
+  return data;
+};

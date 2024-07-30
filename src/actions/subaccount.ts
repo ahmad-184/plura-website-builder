@@ -5,3 +5,13 @@ export const getSubAccount = async (id: string) => {
     where: { id },
   });
 };
+
+export const getSubAccountsByIds = async (ids: string[]) => {
+  return await db.subAccount.findMany({
+    where: {
+      id: {
+        in: ids,
+      },
+    },
+  });
+};

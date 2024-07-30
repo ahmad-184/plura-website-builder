@@ -8,21 +8,12 @@ import { getSubAccount } from "@/actions/subaccount";
 export default async function SidebarLogo({
   id,
   type,
+  logo,
 }: {
   id: string;
   type: SidebarType;
+  logo: string;
 }) {
-  let logo = "";
-
-  if (type === "agency")
-    logo =
-      (await getAgency(id).then((res) => res?.agencyLogo)) ||
-      "/assets/plura-logo.svg";
-  if (type === "subaccount")
-    logo =
-      (await getSubAccount(id).then((res) => res?.subAccountLogo)) ||
-      "/assets/plura-logo.svg";
-
   return (
     <div>
       <AspectRatio ratio={16 / 5}>

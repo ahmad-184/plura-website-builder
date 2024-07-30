@@ -2,7 +2,6 @@ import { SidebarType } from "@/types";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Button } from "../ui/button";
 import { ChevronsUpDownIcon, Compass } from "lucide-react";
-import { getUserAuthDetailsAction } from "@/actions";
 import { redirect } from "next/navigation";
 import {
   Command,
@@ -15,34 +14,34 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { SheetClose } from "../ui/sheet";
-import { useModal } from "@/providers/model-providers";
 import CreateSubaccountButton from "./create-subaccount-button";
+import { getCurrentUserData, getUserPermissions } from "@/actions/user";
+import { getSubAccountsByIds } from "@/actions/subaccount";
+import { Agency, SubAccount } from "@prisma/client";
 
 export default async function SidebarAccountsMenu({
-  id,
   type,
+  details,
 }: {
-  id: string;
   type: SidebarType;
+  details: Agency | SubAccount | null | undefined;
 }) {
-  const [user, err] = await getUserAuthDetailsAction();
+  const user = await getCurrentUserData();
 
-  if (!user || err) return redirect("/");
+  if (!user) return redirect("/");
 
-  const details =
-    type === "agency"
-      ? user.Agency
-      : type === "subaccount"
-      ? user.Agency?.SubAccount.find((sub) => sub.id === id)
-      : null;
+  const user_permission = await getUserPermissions(user.id);
 
   if (!details) return redirect("/");
 
-  const subaccounts = user.Agency?.SubAccount.filter((sub) =>
-    user.Permissions.find((p) => p.subAccountId === sub.id)
-  );
+  const subaccount_ids = user_permission.map((e) => e.subAccountId);
+
+  const subaccounts = await getSubAccountsByIds(subaccount_ids);
 
   const agencyId = user.agencyId;
+
+  // @ts-ignore
+  let agencyLogo = details.agencyLogo;
 
   if (!agencyId) return redirect("/");
 
@@ -74,39 +73,37 @@ export default async function SidebarAccountsMenu({
           <CommandInput placeholder="Search accounts..." />
           <CommandList className="pb-16">
             <CommandEmpty>No result found</CommandEmpty>
-            <CommandGroup heading="Agency">
-              {type === "agency" &&
-              (user.role === "AGENCY_OWNER" || user.role === "AGENCY_ADMIN") ? (
+            {type === "agency" &&
+            (user.role === "AGENCY_OWNER" || user.role === "AGENCY_ADMIN") ? (
+              <CommandGroup heading="Agency">
                 <CommandItem>
                   <SheetClose asChild className="w-full truncate">
                     <Link
-                      href={`/agency/${user?.Agency?.id}`}
+                      href={`/agency/${details.id}`}
                       className="flex gap-4 h-full w-full"
                     >
                       <div className="relative w-16">
                         <Image
-                          src={
-                            user.Agency?.agencyLogo || "/assets/plura-logo.svg"
-                          }
+                          src={agencyLogo || "/assets/plura-logo.svg"}
                           alt="agency logo"
                           fill
                           className="rounded-md object-contain"
                         />
                       </div>
                       <div className="flex flex-col flex-1 truncate">
-                        {user.Agency?.name}
+                        {details.name}
                         <span className="text-muted-foreground truncate">
-                          {user.Agency?.address}
+                          {details.address}
                         </span>
                       </div>
                     </Link>
                   </SheetClose>
                 </CommandItem>
-              ) : null}
-            </CommandGroup>
-            <CommandGroup heading="Accounts">
-              {subaccounts?.length
-                ? subaccounts.map((sub) => (
+              </CommandGroup>
+            ) : null}
+            {subaccounts?.length
+              ? subaccounts.map((sub) => (
+                  <CommandGroup heading="Accounts">
                     <CommandItem>
                       <SheetClose asChild className="w-full truncate">
                         <Link
@@ -132,9 +129,9 @@ export default async function SidebarAccountsMenu({
                         </Link>
                       </SheetClose>
                     </CommandItem>
-                  ))
-                : null}
-            </CommandGroup>
+                  </CommandGroup>
+                ))
+              : null}
           </CommandList>
           {user.role === "AGENCY_OWNER" || user.role === "AGENCY_ADMIN" ? (
             <>

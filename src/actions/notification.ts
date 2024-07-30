@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
-import { Notification } from "@prisma/client";
+import { SidebarType } from "@/types";
+import { Notification, User } from "@prisma/client";
 
 export const createNotification = async (
   data: Omit<Notification, "createdAt" | "updatedAt" | "id">
@@ -25,4 +26,16 @@ export const getSubAccountNotificationsAndUser = async (subId: string) => {
       createdAt: "desc",
     },
   });
+};
+
+export type NotificationsType = (Notification & { User: User })[];
+
+export const getNotificationsByType = async (type: SidebarType, id: string) => {
+  let notifs: NotificationsType | [] = [];
+
+  if (type === "agency") notifs = await getAgencyNotificationsAndUser(id);
+  if (type === "subaccount")
+    notifs = await getSubAccountNotificationsAndUser(id);
+
+  return notifs;
 };
