@@ -1,7 +1,6 @@
 "use client";
 
 import { v4 as uuid4 } from "uuid";
-import { useServerAction } from "zsa-react";
 import { Agency } from "@prisma/client";
 import {
   Form,
@@ -15,7 +14,7 @@ import {
 import { useForm } from "react-hook-form";
 import DropzoneComponent from "../dropzone";
 import FormInput from "../custom/form-input";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Switch } from "../ui/switch";
 import ButtonWithLoaderAndProgress from "../ButtonWithLoaderAndProgress";
 import { z } from "zod";
@@ -35,14 +34,21 @@ import {
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { agencyDetailFormSchema } from "@/zod";
+import { User } from "@clerk/nextjs/server";
+import { agencyFormSchemaType } from "@/types";
+import { useMutation } from "@tanstack/react-query";
 
-type formSchemaType = z.infer<typeof agencyDetailFormSchema>;
-
-export default function AgencyDetails({ data }: { data: Partial<Agency> }) {
+export default function AgencyDetails({
+  data,
+  user,
+}: {
+  data: Partial<Agency>;
+  user?: User;
+}) {
   const router = useRouter();
-  const [isLoading, setLoading] = useState(false);
+  const timeOut = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const form = useForm<formSchemaType>({
+  const form = useForm<agencyFormSchemaType>({
     defaultValues: {
       agencyLogo: data?.agencyLogo,
       companyEmail: data?.companyEmail,
@@ -64,39 +70,41 @@ export default function AgencyDetails({ data }: { data: Partial<Agency> }) {
 
   useEffect(() => {
     if (data) reset({ ...data, goal: data.goal || 1 });
-  }, [data]);
+  }, [data, reset]);
 
   const getUploadedLogoUrl = async (url: string) => {
     if (url) setValue("agencyLogo", url);
   };
 
-  const { execute: createAgency } = useServerAction(createAgencyAction, {
-    onSuccess: () => toast.success("Agency created"),
+  const { mutate: createAgency, isPending: createAgencyPending } = useMutation({
+    mutationFn: createAgencyAction,
+    onSuccess: () => {
+      toast.success("Agency created");
+      window.location.reload();
+    },
     onError: () => toast.error("Could not create agency"),
   });
 
-  const { execute: updateGoal, isPending: updateGoalPending } = useServerAction(
-    updateGoalAction,
-    {
-      onSuccess: () => toast.success("Agency goal updated"),
-      onError: () => toast.error("Could not update agency goal"),
-      retry: {
-        maxAttempts: 3,
-      },
-    }
-  );
-
-  const { execute: updateAgency } = useServerAction(updateAgencyAction, {
-    onSuccess: () => toast.success("Agency information updated"),
-    onError: () => toast.error("Could not update agency information"),
-    retry: {
-      maxAttempts: 3,
+  const { mutate: updateGoal, isPending: updateGoalPending } = useMutation({
+    mutationFn: updateGoalAction,
+    onSuccess: () => {
+      toast.success("Agency goal updated");
+      router.refresh();
     },
+    onError: () => toast.error("Could not update agency goal"),
   });
 
-  const handleSubmitForm = async (formData: formSchemaType) => {
+  const { mutate: updateAgency, isPending: updateAgencyPending } = useMutation({
+    mutationFn: updateAgencyAction,
+    onSuccess: () => {
+      toast.success("Agency information updated");
+      router.refresh();
+    },
+    onError: () => toast.error("Could not update agency information"),
+  });
+
+  const handleSubmitForm = async (formData: agencyFormSchemaType) => {
     try {
-      setLoading(true);
       if (!data?.id) {
         const stripe_cust_data = {
           email: formData.companyEmail,
@@ -126,39 +134,43 @@ export default function AgencyDetails({ data }: { data: Partial<Agency> }) {
 
         const agencyId = uuid4();
 
-        const [newUser, err] = await initUserAction({
+        const new_user = await initUserAction({
           role: "AGENCY_OWNER",
           agencyId,
         });
 
-        if (!newUser || err) return toast.error("Something went wrong");
+        if (!new_user) return toast.error("Something went wrong");
 
-        const [agencyRes, agenyErr] = await createAgency({
+        await createAgency({
           ...formData,
           customerId: custId,
           id: agencyId,
         });
-
-        if (!agencyRes || agenyErr) return toast.error("Something went wrong");
-
-        router.refresh();
       } else if (data?.id) {
         await updateAgency({ ...formData, id: data.id });
+        return;
       }
-
-      window.location.reload();
     } catch (err) {
       console.log(err);
       toast.error("Somthing went wrong");
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleChangeGoal = async (e: number) => {
     if (!data?.id) return;
-    await updateGoal({ agencyId: data.id, goal: e });
+
+    if (timeOut.current) clearTimeout(timeOut.current);
+    timeOut.current = setTimeout(async () => {
+      if (!data?.id) return;
+      updateGoal({ agencyId: data.id, goal: e });
+    }, 1000);
   };
+
+  const isLoading = useMemo(() => {
+    if (updateAgencyPending || createAgencyPending || updateGoalPending)
+      return true;
+    else return false;
+  }, [updateAgencyPending, createAgencyPending, updateGoalPending]);
 
   return (
     <div className="w-full flex flex-col gap-7">
@@ -170,7 +182,8 @@ export default function AgencyDetails({ data }: { data: Partial<Agency> }) {
           <FormField
             control={form.control}
             name="agencyLogo"
-            render={() => (
+            disabled={isLoading}
+            render={({ field }) => (
               <FormItem className="">
                 <FormLabel>Agency logo</FormLabel>
                 <FormControl>
@@ -178,6 +191,7 @@ export default function AgencyDetails({ data }: { data: Partial<Agency> }) {
                     maxSize={1}
                     max_file={1}
                     getValue={getUploadedLogoUrl}
+                    value={field.value}
                   />
                 </FormControl>
                 <FormDescription />
@@ -187,6 +201,7 @@ export default function AgencyDetails({ data }: { data: Partial<Agency> }) {
           />
           <div className="w-full flex-1 flex-col md:flex-row md:gap-3 flex gap-2">
             <FormInput
+              disabled={isLoading}
               control={form.control}
               name="name"
               className="flex-1"
@@ -194,6 +209,7 @@ export default function AgencyDetails({ data }: { data: Partial<Agency> }) {
               label="Agency Name"
             />
             <FormInput
+              disabled={isLoading}
               control={form.control}
               name="companyEmail"
               className="flex-1"
@@ -203,6 +219,7 @@ export default function AgencyDetails({ data }: { data: Partial<Agency> }) {
             />
           </div>
           <FormField
+            disabled={isLoading}
             control={form.control}
             name={"companyPhone"}
             render={({ field }) => (
@@ -215,6 +232,7 @@ export default function AgencyDetails({ data }: { data: Partial<Agency> }) {
             )}
           />
           <FormField
+            disabled={isLoading}
             control={form.control}
             name={"whiteLabel"}
             render={({ field }) => (
@@ -239,6 +257,7 @@ export default function AgencyDetails({ data }: { data: Partial<Agency> }) {
             )}
           />
           <FormInput
+            disabled={isLoading}
             control={form.control}
             name="address"
             className="flex-1"
@@ -247,6 +266,7 @@ export default function AgencyDetails({ data }: { data: Partial<Agency> }) {
           />
           <div className="w-full flex-1 flex-col md:flex-row md:gap-3 flex gap-2">
             <FormInput
+              disabled={isLoading}
               control={form.control}
               name="city"
               className="flex-1"
@@ -254,6 +274,7 @@ export default function AgencyDetails({ data }: { data: Partial<Agency> }) {
               label="City"
             />
             <FormInput
+              disabled={isLoading}
               control={form.control}
               name="state"
               className="flex-1"
@@ -261,6 +282,7 @@ export default function AgencyDetails({ data }: { data: Partial<Agency> }) {
               label="State"
             />
             <FormInput
+              disabled={isLoading}
               control={form.control}
               name="zipCode"
               className="flex-1"
@@ -274,11 +296,13 @@ export default function AgencyDetails({ data }: { data: Partial<Agency> }) {
             className="flex-1"
             placeholder="America"
             label="Country"
+            disabled={isLoading}
           />
           {data?.id ? (
             <>
               <FormField
                 control={form.control}
+                disabled={isLoading}
                 name={"goal"}
                 render={() => (
                   <FormItem>
@@ -294,7 +318,7 @@ export default function AgencyDetails({ data }: { data: Partial<Agency> }) {
                         className="!bg-background !border !border-input !rounded-md"
                         onValueChange={handleChangeGoal}
                         readOnly
-                        disabled={updateGoalPending}
+                        disabled={isLoading || updateGoalPending}
                       />
                     </FormControl>
                   </FormItem>
@@ -307,12 +331,13 @@ export default function AgencyDetails({ data }: { data: Partial<Agency> }) {
             className={cn("mt-2")}
             variant={"default"}
             loading={isLoading}
+            disabled={isLoading}
           >
             {data?.id ? "Save agency Informations" : "Create Agency"}
           </ButtonWithLoaderAndProgress>
         </form>
       </Form>
-      {data?.id ? (
+      {data?.id && user && user.privateMetadata.role === "AGENCY_OWNER" ? (
         <div>
           <Separator className="mb-7" />
           <div className="w-full">

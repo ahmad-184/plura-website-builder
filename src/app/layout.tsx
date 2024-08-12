@@ -11,6 +11,7 @@ const dm_sans = DM_Sans({ subsets: ["latin"], display: "swap" });
 export const metadata: Metadata = {
   title: "Plura",
   description: "All in one Agency Solution",
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({

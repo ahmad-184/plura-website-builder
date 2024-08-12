@@ -1,11 +1,10 @@
 "use client";
 
 import shortuuid from "short-uuid";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import axios from "axios";
-import { env } from "@/env";
-import { useEnvVars } from "@/providers/ClientEnvironmentVars";
+import { useEnvVars } from "@/providers/client-environment-vars";
 
 // upload files using cloudinary storage
 ("---------------------------------------------------");

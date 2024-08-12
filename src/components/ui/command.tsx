@@ -39,15 +39,15 @@ const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
 
 interface CustomCommandInputType
   extends React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input> {
-  searchDivClass?: string;
+  searchDivClassName?: string;
 }
 
 const CommandInput = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Input>,
   CustomCommandInputType
->(({ className, searchDivClass, ...props }, ref) => (
+>(({ className, searchDivClassName, ...props }, ref) => (
   <div
-    className={cn("flex items-center border-b px-3", searchDivClass)}
+    className={cn("flex items-center border-b px-3", searchDivClassName)}
     cmdk-input-wrapper=""
   >
     <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />

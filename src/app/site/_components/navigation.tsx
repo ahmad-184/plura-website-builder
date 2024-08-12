@@ -9,7 +9,7 @@ export default function Navigation() {
 
   return (
     <div className="p-4 flex items-center justify-between relative">
-      <aside className="flex items-center gap-2">
+      <aside className="flex items-center gap-2 select-none">
         <Image
           src={"./assets/plura-logo.svg"}
           alt="plura logo"
@@ -30,7 +30,6 @@ export default function Navigation() {
         <ModeToggle />
         <Link
           href={"/agency"}
-          // className="bg-primary font-medium text-white p-2 px-4 rounded-md hover:bg-primary/80"
           className="inline-flex py-2 animate-background-shine
            items-center justify-center rounded-md border
             border-gray-800 bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] 

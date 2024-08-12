@@ -5,18 +5,21 @@ import { Button } from "../ui/button";
 import CustomDialog from "../custom/custom-dialog";
 import SubAccountDetails from "../subaccount-details";
 import { PlusCircleIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function CreateSubaccountButton({
   agencyId,
+  className,
 }: {
   agencyId: string;
+  className?: string;
 }) {
   const { setOpen } = useModal();
 
   return (
     <>
       <Button
-        className="w-full flex gap-2"
+        className={cn("w-full flex gap-2", className)}
         onClick={() => {
           setOpen({
             modal: (

@@ -1,4 +1,4 @@
-import { CalculatorIcon, CheckIcon, ChevronsUpDown } from "lucide-react";
+import { CheckIcon, ChevronsUpDown } from "lucide-react";
 
 import * as React from "react";
 
@@ -43,6 +43,7 @@ const PhoneInput: React.ForwardRefExoticComponent<PhoneInputProps> =
           flagComponent={FlagComponent}
           countrySelectComponent={CountrySelect}
           inputComponent={InputComponent}
+          international
           /**
            * Handles the onChange event.
            *
@@ -112,8 +113,8 @@ const CountrySelect = ({
           />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[300px] p-0">
-        <Command className="">
+      <PopoverContent className="w-[300px] p-0 z-[500]">
+        <Command>
           <CommandList className="dark:border-gray-800">
             <ScrollArea className="h-72">
               <CommandInput placeholder="Search country..." />

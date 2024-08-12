@@ -1,11 +1,12 @@
 "use client";
 
-import { Agency, User } from "@prisma/client";
+import { Agency, SubAccount, User } from "@prisma/client";
 import { createContext, useContext, useEffect, useState } from "react";
 
 interface ModalData {
-  user?: User;
-  agency?: Agency;
+  user?: User | null;
+  agency?: Agency | null;
+  subaccounts?: SubAccount[] | [];
 }
 
 type ContextTypes = {
@@ -19,6 +20,7 @@ type ContextTypes = {
     fetchData?: () => Promise<any>;
   }) => void;
   setClose: () => void;
+  isfetching: boolean;
 };
 
 const Context = createContext<ContextTypes>({
@@ -26,6 +28,7 @@ const Context = createContext<ContextTypes>({
   isOpen: false,
   setOpen: () => {},
   setClose: () => {},
+  isfetching: false,
 });
 
 export const useModal = () => {
@@ -40,11 +43,16 @@ const ModalProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [data, setData] = useState<ModalData>({});
+  const [data, setData] = useState<ModalData>({
+    agency: null,
+    subaccounts: [],
+    user: null,
+  });
   const [isMounted, setIsMounted] = useState(false);
   const [showingModal, setShowingModal] = useState<React.ReactNode | null>(
     null
   );
+  const [fetchingData, setFechingData] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -58,12 +66,20 @@ const ModalProvider: React.FC<{ children: React.ReactNode }> = ({
     fetchData?: () => Promise<any>;
   }) => {
     if (modal) {
-      if (fetchData) {
-        const res = await fetchData();
-        setData({ ...data, ...res });
-      }
       setShowingModal(modal);
       setIsOpen(true);
+      if (fetchData) {
+        try {
+          setFechingData(true);
+          const res = await fetchData();
+          if (res) setData(res);
+        } catch (err) {
+          console.log(err);
+          setData({});
+        } finally {
+          setFechingData(false);
+        }
+      }
     }
   };
 
@@ -82,6 +98,7 @@ const ModalProvider: React.FC<{ children: React.ReactNode }> = ({
         setOpen,
         data,
         isOpen,
+        isfetching: fetchingData,
       }}
     >
       {children}

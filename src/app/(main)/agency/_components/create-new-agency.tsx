@@ -19,8 +19,8 @@ export default function CreateNewAgecny({
       <CardHeader>
         <CardTitle>Agency information</CardTitle>
         <CardDescription>
-          Let's create an agency for your bussiness. You can edit agency
-          settings later from agency setting tab
+          Lets create an agency for your bussiness. You can edit agency settings
+          later from agency setting tab
         </CardDescription>
       </CardHeader>
       <CardContent>

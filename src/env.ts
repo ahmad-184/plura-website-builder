@@ -15,12 +15,11 @@ export const env = createEnv({
     CLERK_SECRET_KEY: z.string(),
     DB_USERNAME: z.string(),
     DB_PASSWORD: z.string(),
-    EMAIL_SERVER_USER: z.string(),
-    EMAIL_SERVER_PASSWORD: z.string(),
-    EMAIL_SERVER_HOST: z.string(),
-    EMAIL_SERVER_PORT: z.string(),
-    EMAIL_FROM: z.string(),
     NODE_ENV: z.string(),
+    EMAILSENDER_ADDRESS: z.string(),
+    EMAILSENDER_PASS: z.string(),
+    SERVICE_ROLE_KEY: z.string(),
+    PW: z.string(),
   },
   client: {
     NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: z.string(),
@@ -42,6 +41,8 @@ export const env = createEnv({
     NEXT_PUBLIC_CLERK_SIGN_UP_URL: z.string(),
     NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: z.string(),
     NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: z.string(),
+    NEXT_PUBLIC_SUPABASE_URL: z.string(),
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string(),
   },
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
@@ -57,11 +58,6 @@ export const env = createEnv({
     CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
     DB_USERNAME: process.env.DB_USERNAME,
     DB_PASSWORD: process.env.DB_PASSWORD,
-    EMAIL_SERVER_USER: process.env.EMAIL_SERVER_USER,
-    EMAIL_SERVER_PASSWORD: process.env.EMAIL_SERVER_PASSWORD,
-    EMAIL_SERVER_HOST: process.env.EMAIL_SERVER_HOST,
-    EMAIL_SERVER_PORT: process.env.EMAIL_SERVER_PORT,
-    EMAIL_FROM: process.env.EMAIL_FROM,
     NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME:
       process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
     NEXT_PUBLIC_CLOUDINARY_UPLOAD_FOLDER:
@@ -91,5 +87,11 @@ export const env = createEnv({
       process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL,
     NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL:
       process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL,
+    EMAILSENDER_ADDRESS: process.env.EMAILSENDER_ADDRESS,
+    EMAILSENDER_PASS: process.env.EMAILSENDER_PASS,
+    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    SERVICE_ROLE_KEY: process.env.SERVICE_ROLE_KEY,
+    PW: process.env.PW,
   },
 });

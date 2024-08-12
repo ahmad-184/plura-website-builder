@@ -13,6 +13,7 @@ interface Props
   variant?: VariantProps<typeof buttonVariants>["variant"];
   isUploading?: boolean;
   progress?: number;
+  loaderColor?: string;
 }
 
 const ButtonWithLoaderAndProgress: React.FC<Props> = ({
@@ -21,11 +22,14 @@ const ButtonWithLoaderAndProgress: React.FC<Props> = ({
   progress,
   children,
   className,
+  loaderColor,
   ...props
 }) => {
   return (
     <Button className={cn("disabled:opacity-100", className)} {...props}>
-      {!isUploading && loading ? <Loader className="w-7" /> : null}
+      {!isUploading && loading ? (
+        <Loader className="w-7" loaderColor={loaderColor} />
+      ) : null}
       {isUploading ? (
         <div className="flex w-full items-center gap-1">
           <small className="text-muted dark:text-slate-300">{progress}%</small>

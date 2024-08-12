@@ -10,10 +10,12 @@ export default function DropzoneComponent({
   max_file = 1,
   maxSize = 1,
   getValue,
+  value,
 }: {
   max_file?: number;
   maxSize?: number;
   getValue: (url: string) => void;
+  value?: string;
 }) {
   const [filesPreview, setFilesPreview] = useState<
     (File & { preview: string })[]
@@ -46,7 +48,6 @@ export default function DropzoneComponent({
     onDropRejected: (error) => {
       error.map((e) => {
         e.errors.map((r) => {
-          console.log(r);
           if (r.code === "file-too-large") {
             toast.error(`File size too large`);
           }
@@ -76,6 +77,12 @@ export default function DropzoneComponent({
     }
   };
 
+  const removeFiles = () => {
+    setFiles([]);
+    setFilesPreview([]);
+    getValue("");
+  };
+
   useEffect(() => {
     if (files.length) {
       upload();
@@ -90,7 +97,18 @@ export default function DropzoneComponent({
       >
         <input {...getInputProps()} />
         <div className="w-full h-full flex flex-col gap-3 items-center justify-center">
-          {filesPreview.length ? (
+          {value ? (
+            <>
+              <div className="relative w-40 h-40" key={value}>
+                <Image
+                  src={value}
+                  alt="uploaded image"
+                  className="object-contain"
+                  fill
+                />
+              </div>
+            </>
+          ) : filesPreview.length ? (
             <>
               {filesPreview.map((file) => (
                 <div className="relative w-40 h-40" key={file.name}>
@@ -108,7 +126,7 @@ export default function DropzoneComponent({
               <CloudUploadIcon className="w-[55px] h-[55px] dark:text-gray-400 text-gray-500" />
             </div>
           )}
-          {files.length ? null : (
+          {files.length || value ? null : (
             <p className="dark:text-blue-400 text-blue-700">
               Choose file or drag and drop
             </p>

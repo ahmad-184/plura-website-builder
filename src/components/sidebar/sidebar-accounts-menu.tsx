@@ -15,35 +15,22 @@ import Link from "next/link";
 import Image from "next/image";
 import { SheetClose } from "../ui/sheet";
 import CreateSubaccountButton from "./create-subaccount-button";
-import { getCurrentUserData, getUserPermissions } from "@/actions/user";
-import { getSubAccountsByIds } from "@/actions/subaccount";
-import { Agency, SubAccount } from "@prisma/client";
+import { Agency, SubAccount, User } from "@prisma/client";
 
 export default async function SidebarAccountsMenu({
   type,
   details,
+  user,
+  agencyDetails,
+  subaccounts,
 }: {
   type: SidebarType;
   details: Agency | SubAccount | null | undefined;
+  subaccounts: SubAccount[] | [];
+  user: User;
+  agencyDetails: Agency;
 }) {
-  const user = await getCurrentUserData();
-
-  if (!user) return redirect("/");
-
-  const user_permission = await getUserPermissions(user.id);
-
   if (!details) return redirect("/");
-
-  const subaccount_ids = user_permission.map((e) => e.subAccountId);
-
-  const subaccounts = await getSubAccountsByIds(subaccount_ids);
-
-  const agencyId = user.agencyId;
-
-  // @ts-ignore
-  let agencyLogo = details.agencyLogo;
-
-  if (!agencyId) return redirect("/");
 
   return (
     <Popover>
@@ -57,9 +44,9 @@ export default async function SidebarAccountsMenu({
               <Compass />
             </div>
             <div className="flex flex-col truncate">
-              {details?.name}
+              {details.name}
               <span className="text-muted-foreground truncate">
-                {details?.address}
+                {details.address}
               </span>
             </div>
           </div>
@@ -73,27 +60,29 @@ export default async function SidebarAccountsMenu({
           <CommandInput placeholder="Search accounts..." />
           <CommandList className="pb-16">
             <CommandEmpty>No result found</CommandEmpty>
-            {type === "agency" &&
-            (user.role === "AGENCY_OWNER" || user.role === "AGENCY_ADMIN") ? (
+            {(user.role === "AGENCY_OWNER" || user.role === "AGENCY_ADMIN") &&
+            agencyDetails ? (
               <CommandGroup heading="Agency">
                 <CommandItem>
                   <SheetClose asChild className="w-full truncate">
                     <Link
-                      href={`/agency/${details.id}`}
+                      href={`/agency/${agencyDetails.id}`}
                       className="flex gap-4 h-full w-full"
                     >
                       <div className="relative w-16">
                         <Image
-                          src={agencyLogo || "/assets/plura-logo.svg"}
+                          src={
+                            agencyDetails.agencyLogo || "/assets/plura-logo.svg"
+                          }
                           alt="agency logo"
                           fill
                           className="rounded-md object-contain"
                         />
                       </div>
                       <div className="flex flex-col flex-1 truncate">
-                        {details.name}
+                        {agencyDetails.name}
                         <span className="text-muted-foreground truncate">
-                          {details.address}
+                          {agencyDetails.address}
                         </span>
                       </div>
                     </Link>
@@ -101,42 +90,44 @@ export default async function SidebarAccountsMenu({
                 </CommandItem>
               </CommandGroup>
             ) : null}
-            {subaccounts?.length
-              ? subaccounts.map((sub) => (
-                  <CommandGroup heading="Accounts">
-                    <CommandItem>
-                      <SheetClose asChild className="w-full truncate">
-                        <Link
-                          href={`/agency/${sub?.id}`}
-                          className="flex gap-4 h-full w-full"
-                        >
-                          <div className="relative w-16">
-                            <Image
-                              src={
-                                sub?.subAccountLogo || "/assets/plura-logo.svg"
-                              }
-                              alt="agency logo"
-                              fill
-                              className="rounded-md object-contain"
-                            />
-                          </div>
-                          <div className="flex flex-col flex-1 truncate">
-                            {sub?.name}
-                            <span className="text-muted-foreground truncate">
-                              {sub?.address}
-                            </span>
-                          </div>
-                        </Link>
-                      </SheetClose>
-                    </CommandItem>
-                  </CommandGroup>
+            <CommandGroup heading="Accounts">
+              {subaccounts?.length ? (
+                subaccounts.map((sub) => (
+                  <CommandItem key={sub.id}>
+                    <SheetClose asChild className="w-full truncate">
+                      <Link
+                        href={`/subaccount/${sub?.id}`}
+                        className="flex gap-4 h-full w-full"
+                      >
+                        <div className="relative w-16">
+                          <Image
+                            src={
+                              sub?.subAccountLogo || "/assets/plura-logo.svg"
+                            }
+                            alt="agency logo"
+                            fill
+                            className="rounded-md object-contain"
+                          />
+                        </div>
+                        <div className="flex flex-col flex-1 truncate">
+                          {sub?.name}
+                          <span className="text-muted-foreground truncate">
+                            {sub?.address}
+                          </span>
+                        </div>
+                      </Link>
+                    </SheetClose>
+                  </CommandItem>
                 ))
-              : null}
+              ) : (
+                <div className="flex w-full text-center mt-5 justify-center">
+                  <small className="text-muted-foreground">No Accounts</small>
+                </div>
+              )}
+            </CommandGroup>
           </CommandList>
-          {user.role === "AGENCY_OWNER" || user.role === "AGENCY_ADMIN" ? (
-            <>
-              <CreateSubaccountButton agencyId={agencyId} />
-            </>
+          {type === "agency" && user.role === "AGENCY_OWNER" ? (
+            <CreateSubaccountButton agencyId={agencyDetails.id} />
           ) : null}
         </Command>
       </PopoverContent>

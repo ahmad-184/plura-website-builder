@@ -1,4 +1,4 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { clerkMiddleware } from "@clerk/nextjs/server";
 import { env } from "./env";
 import { NextResponse } from "next/server";
 
@@ -7,7 +7,7 @@ export default clerkMiddleware(async (auth, req) => {
   const searchParams = url.searchParams.toString();
   let hostname = req.headers;
 
-  const pathWidthSearchParams = `${url.pathname}${
+  const pathWithSearchParams = `${url.pathname}${
     searchParams.length ? `?${searchParams}` : ""
   }`;
 
@@ -19,7 +19,7 @@ export default clerkMiddleware(async (auth, req) => {
 
   if (customSubdomain)
     return NextResponse.rewrite(
-      new URL(`/${customSubdomain}${pathWidthSearchParams}`, req.url)
+      new URL(`/${customSubdomain}${pathWithSearchParams}`, req.url)
     );
 
   if (url.pathname === "/sign-in" || url.pathname === "/sign-up")
@@ -35,7 +35,7 @@ export default clerkMiddleware(async (auth, req) => {
     url.pathname.startsWith("/agency") ||
     url.pathname.startsWith("/subaccount")
   )
-    return NextResponse.rewrite(new URL(`${pathWidthSearchParams}`, req.url));
+    return NextResponse.rewrite(new URL(`${pathWithSearchParams}`, req.url));
 });
 
 export const config = {

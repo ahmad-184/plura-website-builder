@@ -1,7 +1,6 @@
 "use client";
 
 import { v4 as uuid4 } from "uuid";
-import { useServerAction } from "zsa-react";
 import { SubAccount } from "@prisma/client";
 import {
   Form,
@@ -15,7 +14,7 @@ import {
 import { useForm } from "react-hook-form";
 import DropzoneComponent from "../dropzone";
 import FormInput from "../custom/form-input";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo } from "react";
 import ButtonWithLoaderAndProgress from "../ButtonWithLoaderAndProgress";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,7 +23,7 @@ import { cn } from "@/lib/utils";
 import { PhoneInput } from "../custom/phone-input";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { agencyDetailFormSchema, subAccountDetailFormSchema } from "@/zod";
+import { subAccountDetailFormSchema } from "@/zod";
 import { createSubAccountAction, updateSubAccountAction } from "@/actions";
 import {
   Card,
@@ -33,6 +32,8 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
+import { useModal } from "@/providers/model-providers";
+import { useMutation } from "@tanstack/react-query";
 
 type formSchemaType = z.infer<typeof subAccountDetailFormSchema>;
 
@@ -44,7 +45,7 @@ export default function SubAccountDetails({
   agencyId: string;
 }) {
   const router = useRouter();
-  const [isLoading, setLoading] = useState(false);
+  const { setClose, isOpen } = useModal();
 
   const form = useForm<formSchemaType>({
     defaultValues: {
@@ -58,7 +59,7 @@ export default function SubAccountDetails({
       country: data?.country,
       subAccountLogo: data?.subAccountLogo,
     },
-    resolver: zodResolver(agencyDetailFormSchema),
+    resolver: zodResolver(subAccountDetailFormSchema),
     mode: "onChange",
   });
 
@@ -72,54 +73,56 @@ export default function SubAccountDetails({
     if (url) setValue("subAccountLogo", url);
   };
 
-  const { execute: createSubAcnount } = useServerAction(
-    createSubAccountAction,
-    {
-      onSuccess: () => toast.success("Account created"),
-      onError: () => toast.error("Could not create Account"),
-    }
-  );
-
-  const { execute: updateSubAccount } = useServerAction(
-    updateSubAccountAction,
-    {
-      onSuccess: () => toast.success("Account information updated"),
-      onError: () => toast.error("Could not update Account information"),
-      retry: {
-        maxAttempts: 3,
+  const { mutate: createSubAccount, isPending: createSubaccountPending } =
+    useMutation({
+      mutationFn: createSubAccountAction,
+      onSuccess: () => {
+        toast.success("Account created");
+        router.refresh();
+        if (isOpen) setClose();
       },
-    }
-  );
+      onError: () => toast.error("Could not create Account"),
+    });
+
+  const { mutate: updateSubaccount, isPending: updateSubaccountPending } =
+    useMutation({
+      mutationFn: updateSubAccountAction,
+      onSuccess: () => {
+        toast.success("Account information updated");
+        router.refresh();
+        if (isOpen) setClose();
+      },
+      onError: () => toast.error("Could not update Account information"),
+    });
+
+  const isLoading = useMemo(() => {
+    if (createSubaccountPending || updateSubaccountPending) return true;
+    else return false;
+  }, [createSubaccountPending, updateSubaccountPending]);
 
   const handleSubmitForm = async (formData: formSchemaType) => {
-    if (agencyId) return toast.success("agency id required");
-
+    console.log("clicked");
+    if (!agencyId) return toast.success("agency id required");
     try {
-      setLoading(true);
       if (!data?.id) {
         const subAccountId = uuid4();
-
-        const [agencyRes, agenyErr] = await createSubAcnount({
+        createSubAccount({
           ...formData,
           id: subAccountId,
           agencyId: agencyId,
         });
+      }
 
-        if (!agencyRes || agenyErr) return toast.error("Something went wrong");
-      } else if (data?.id) {
-        await updateSubAccount({
+      if (data?.id) {
+        await updateSubaccount({
           ...formData,
           id: data.id,
           agencyId: agencyId,
         });
       }
-
-      router.refresh();
     } catch (err) {
       console.log(err);
       toast.error("Somthing went wrong");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -137,16 +140,18 @@ export default function SubAccountDetails({
               onSubmit={form.handleSubmit(handleSubmitForm)}
             >
               <FormField
+                disabled={isLoading}
                 control={form.control}
                 name="subAccountLogo"
-                render={() => (
-                  <FormItem className="">
+                render={({ field }) => (
+                  <FormItem>
                     <FormLabel>Agency logo</FormLabel>
                     <FormControl>
                       <DropzoneComponent
                         maxSize={1}
                         max_file={1}
                         getValue={getUploadedLogoUrl}
+                        value={field.value}
                       />
                     </FormControl>
                     <FormDescription />
@@ -156,6 +161,7 @@ export default function SubAccountDetails({
               />
               <div className="w-full flex-1 flex-col md:flex-row md:gap-3 flex gap-2">
                 <FormInput
+                  disabled={isLoading}
                   control={form.control}
                   name="name"
                   className="flex-1"
@@ -163,6 +169,7 @@ export default function SubAccountDetails({
                   label="Account Name"
                 />
                 <FormInput
+                  disabled={isLoading}
                   control={form.control}
                   name="companyEmail"
                   className="flex-1"
@@ -172,6 +179,7 @@ export default function SubAccountDetails({
                 />
               </div>
               <FormField
+                disabled={isLoading}
                 control={form.control}
                 name={"companyPhone"}
                 render={({ field }) => (
@@ -184,6 +192,7 @@ export default function SubAccountDetails({
                 )}
               />
               <FormInput
+                disabled={isLoading}
                 control={form.control}
                 name="address"
                 className="flex-1"
@@ -192,6 +201,7 @@ export default function SubAccountDetails({
               />
               <div className="w-full flex-1 flex-col md:flex-row md:gap-3 flex gap-2">
                 <FormInput
+                  disabled={isLoading}
                   control={form.control}
                   name="city"
                   className="flex-1"
@@ -204,8 +214,10 @@ export default function SubAccountDetails({
                   className="flex-1"
                   placeholder="USA"
                   label="State"
+                  disabled={isLoading}
                 />
                 <FormInput
+                  disabled={isLoading}
                   control={form.control}
                   name="zipCode"
                   className="flex-1"
@@ -214,6 +226,7 @@ export default function SubAccountDetails({
                 />
               </div>
               <FormInput
+                disabled={isLoading}
                 control={form.control}
                 name="country"
                 className="flex-1"
@@ -224,6 +237,7 @@ export default function SubAccountDetails({
                 type="submit"
                 className={cn("mt-2")}
                 variant={"default"}
+                disabled={isLoading}
                 loading={isLoading}
               >
                 {data?.id

@@ -1,18 +1,6 @@
-import { ClerkProvider } from "@clerk/nextjs";
-import { dark } from "@clerk/themes";
+import { auth } from "@clerk/nextjs/server";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return (
-    <>
-      {/* <ClerkProvider
-      appearance={
-        {
-          // baseTheme: [dark],
-        }
-      }
-    > */}
-      {children}
-      {/* </ClerkProvider> */}
-    </>
-  );
+  auth().protect();
+  return <>{children}</>;
 }

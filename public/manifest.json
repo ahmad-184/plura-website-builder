@@ -1,0 +1,30 @@
+{
+  "name": "Plura",
+  "short_name": "plura",
+  "description": "All in one Agency Solution",
+  "theme_color": "#2563eb",
+  "background_color": "#020817",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "id": "/",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "/icons/logo192.jpg",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/logo384.png",
+      "sizes": "384x384",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/logo512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

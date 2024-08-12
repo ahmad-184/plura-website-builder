@@ -18,6 +18,7 @@ export default function FormInput({
   message,
   className,
   readOnly,
+  disabled,
 }: {
   control: any;
   placeholder?: string;
@@ -27,11 +28,13 @@ export default function FormInput({
   message?: string;
   className?: string;
   readOnly?: boolean;
+  disabled?: boolean;
 }) {
   return (
     <FormField
       control={control}
       name={name}
+      disabled={disabled}
       render={({ field }) => (
         <FormItem className={cn("", className)}>
           {label && <FormLabel>{label}</FormLabel>}

@@ -4,9 +4,11 @@ import { SidebarType } from "@/types";
 import SidebarAccountsMenu from "./sidebar-accounts-menu";
 import { AccountsSkeleton, SidebarOptionsSkeleton } from "./loading-fallbacks";
 import SidebarMenuOptions from "./sidebar-menu-options";
-import { Agency, SubAccount } from "@prisma/client";
-import { getAgencyOrSubAccount } from "@/actions/global-use-case";
+import { Agency, SubAccount, User } from "@prisma/client";
 import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/actions/user";
+import { db } from "@/lib/db";
+import { returnUserDataUseCase } from "@/lib/use-case";
 
 export default async function SidebarContent({
   id,
@@ -15,19 +17,68 @@ export default async function SidebarContent({
   id: string;
   type: SidebarType;
 }) {
+  const user = await getCurrentUser();
+  if (!user) return redirect("/");
+
+  const getAllNeededData = await db.user.findUnique({
+    where: {
+      id: user.id,
+    },
+    include: {
+      Agency: true,
+      Permissions: {
+        include: {
+          SubAccount: true,
+        },
+      },
+    },
+  });
+
+  if (!getAllNeededData) return redirect("/");
+
+  const userData: User = returnUserDataUseCase(getAllNeededData);
+
+  if (!userData) return redirect("/");
+
   const details: Agency | SubAccount | null | undefined =
-    await getAgencyOrSubAccount(type, id);
+    type === "agency"
+      ? getAllNeededData.Agency
+      : getAllNeededData.Permissions.filter((per) => per.access).find(
+          (p) => p.subAccountId === id
+        )?.SubAccount;
 
   if (!details) return redirect("/");
 
-  // @ts-ignore
-  const logo = type === "agency" ? details.agencyLogo : details.subAccountLogo;
+  const subaccounts = getAllNeededData.Permissions.filter(
+    (per) => per.access
+  ).map((p) => p.SubAccount);
+
+  const agencyDetails = getAllNeededData.Agency;
+
+  if (!agencyDetails) return redirect("/");
+
+  let logo =
+    type === "agency"
+      ? (details as Agency).agencyLogo
+      : (details as SubAccount).subAccountLogo;
+
+  if (agencyDetails) {
+    if (agencyDetails.whiteLabel) {
+      logo = agencyDetails.agencyLogo;
+    }
+  }
 
   return (
     <div>
       <SidebarLogo id={id} type={type} logo={logo} />
       <Suspense fallback={<AccountsSkeleton />}>
-        <SidebarAccountsMenu type={type} details={details} />
+        <SidebarAccountsMenu
+          user={userData}
+          type={type}
+          details={details}
+          agencyDetails={agencyDetails}
+          subaccounts={subaccounts}
+        />
       </Suspense>
       <Suspense fallback={<SidebarOptionsSkeleton />}>
         <SidebarMenuOptions type={type} id={id} />

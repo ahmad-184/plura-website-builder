@@ -10,7 +10,7 @@ const Loader: React.FC<LoaderProps> = ({ loaderColor, ...props }) => {
       <svg
         aria-hidden="true"
         className={cn(
-          "inline mr-2 text-gray-400 animate-spin dark:text-primary-foreground/30",
+          "mr-2 text-gray-400 animate-spin w-full h-full flex items-center justify-center dark:text-primary-foreground/30",
           {
             "fill-primary-foreground": !loaderColor,
           },
