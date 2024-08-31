@@ -22,13 +22,11 @@ import { changeUserPermissionAction, updateUserAction } from "@/actions";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { updateUserProfileClerk } from "@/actions/clerk";
 import { Separator } from "../ui/Separator";
 import { Switch } from "../ui/switch";
 import { TeamMemberscolumnsProps } from "@/app/(main)/agency/[agencyId]/team/columns";
 import SelectRole from "../custom/select-role";
 import { useModal } from "@/providers/model-providers";
-import { Skeleton } from "../ui/skeleton";
 import { useMutation } from "@tanstack/react-query";
 
 type userDetailsFormType = z.infer<typeof userDetailsFormSchema>;
@@ -42,7 +40,6 @@ export default function UserDetails({
   user: (User & { Permissions?: Permissions[] }) | TeamMemberscolumnsProps;
   have_permission?: boolean;
 }) {
-  const [imageFiles, setImageFiles] = useState<File[] | []>([]);
   const [subaccounts, setSubaccount] = useState<SubAccount[] | []>([]);
 
   const { isOpen, data, isfetching } = useModal();
@@ -62,29 +59,27 @@ export default function UserDetails({
       avatarUrl: user?.avatarUrl,
       email: user?.email,
       name: user?.name,
-      role: user?.role,
+      role: user?.role!,
     },
   });
 
   const { mutate: updateUser, isPending: updateUserPending } = useMutation({
     mutationFn: async (e: userDetailsFormType) => {
-      if (!user || !user.id) throw new Error("user id required");
+      if (!user || !user.id) throw new Error("User id required");
       const res = await updateUserAction(e);
-      if (!res) throw new Error("Something went wrong, please try again");
-      if (imageFiles.length) {
-        const formData = new FormData();
-        formData.append("file", imageFiles[0]);
-        formData.append("user_id", user.id);
-
-        await updateUserProfileClerk(formData);
-      }
+      if (!res) throw new Error("Could not update user information");
       return res;
     },
     onSuccess: () => {
-      toast.success("User information updated");
+      toast.success("Success", {
+        description: "User information updated",
+        icon: "🎉",
+      });
       router.refresh();
     },
-    onError: () => toast.success("Could not update user information"),
+    onError: (e) => {
+      toast.error("Error", { description: e.message, icon: "🛑" });
+    },
   });
 
   const onSubmit = async (values: userDetailsFormType) => {
@@ -101,10 +96,15 @@ export default function UserDetails({
     useMutation({
       mutationFn: changeUserPermissionAction,
       onSuccess: () => {
-        toast.success("Permission changed successfully");
+        toast.success("Success", {
+          description: "Permission changed successfully",
+          icon: "🎉",
+        });
         return router.refresh();
       },
-      onError: () => toast.error("Something went wrong, please try again"),
+      onError: (e) => {
+        toast.error("Error", { description: e.message, icon: "🛑" });
+      },
     });
 
   const onPermisssionChange = async (
@@ -165,7 +165,6 @@ export default function UserDetails({
                       max_file={1}
                       getValue={(url: string, files) => {
                         form.setValue("avatarUrl", url);
-                        setImageFiles(files || []);
                       }}
                       value={field.value}
                       className="w-[200px] h-[200px] rounded-lg"
@@ -173,7 +172,6 @@ export default function UserDetails({
                     <div
                       onClick={() => {
                         form.setValue("avatarUrl", user?.avatarUrl);
-                        setImageFiles([]);
                       }}
                       className="flex rounded-lg bg-muted text-muted-foreground text-sm items-center gap-1 p-1 cursor-pointer hover:underline"
                     >
@@ -205,7 +203,7 @@ export default function UserDetails({
             include_agency_owner={user?.role === "AGENCY_OWNER"}
           />
           <ButtonWithLoaderAndProgress
-            className="mt-1"
+            className="mt-1 w-fit"
             disabled={isLoading}
             loading={isLoading}
           >

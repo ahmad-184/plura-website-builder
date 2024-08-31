@@ -5,7 +5,7 @@ import { memo } from "react";
 import { User } from "@prisma/client";
 
 interface CustomAvatarProps {
-  user: User;
+  user: Partial<User>;
   className?: string;
   onClick?: () => void;
   width?: number;
@@ -43,4 +43,4 @@ const CustomAvatar: React.FC<CustomAvatarProps> = ({
   );
 };
 
-export default memo(CustomAvatar);
+export default CustomAvatar;

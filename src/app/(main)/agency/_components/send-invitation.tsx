@@ -26,7 +26,6 @@ import { sendInvitationSchema } from "@/zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { UserIcon } from "lucide-react";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -42,10 +41,14 @@ const SendInvitation = () => {
   const { mutate: sendInvitation, isPending } = useMutation({
     mutationFn: sendInvitationAction,
     onSuccess: () => {
-      toast.success("Invitation send");
+      toast.success("Success", {
+        description: "Invitation successfully send",
+        icon: "🎉",
+      });
       form.reset();
     },
-    onError: () => toast.success("Could not send invitation"),
+    onError: (e) =>
+      toast.error("Error", { description: e.message, icon: "🛑" }),
   });
 
   const handleSubmit = async (values: sendInvitationSchemaType) => {

@@ -149,6 +149,10 @@ const config = {
           "0%": { transform: "translateY(-30px) scale(0.2)" },
           "100%": { transform: "transform: translateY(0px) scale(1)" },
         },
+        "caret-blink": {
+          "0%,70%,100%": { opacity: "1" },
+          "20%,50%": { opacity: "0" },
+        },
         "background-shine": {
           from: {
             backgroundPosition: "0 0",
@@ -163,6 +167,7 @@ const config = {
         "accordion-up": "accordion-up 0.2s ease-out",
         "automation-zoom-in": "automation-zoom-in 0.5s",
         "background-shine": "background-shine 2s linear infinite",
+        "caret-blink": "caret-blink 1.25s ease-out infinite",
       },
     },
   },

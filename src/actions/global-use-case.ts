@@ -4,7 +4,10 @@ import { db } from "@/lib/db";
 import { createNotification } from "./notification";
 import { SidebarType } from "@/types";
 import { AgencySidebarOption, SubAccountSidebarOption } from "@prisma/client";
-import { getCurrentUser } from "./user";
+import { headers } from "next/headers";
+import { rateLimit } from "@/lib/rate-limit";
+import { TooManyRequest } from "@/lib/errors";
+import { getCurrentUser } from "./auth";
 
 export const saveActivityLogsNotification = async ({
   agencyId,
@@ -31,31 +34,15 @@ export const saveActivityLogsNotification = async ({
           },
         },
       });
-    } else
-      find_user = await db.user.findUnique({
-        where: {
-          email: user?.emailAddresses[0].emailAddress,
-        },
-      });
+    } else find_user = user;
 
     if (!find_user) return;
-
-    const role =
-      find_user.role === "AGENCY_OWNER"
-        ? "Owner"
-        : find_user.role === "AGENCY_ADMIN"
-        ? "Admin"
-        : find_user.role === "SUBACCOUNT_USER"
-        ? "User"
-        : find_user.role === "SUBACCOUNT_GUEST"
-        ? "Guest"
-        : "";
 
     await createNotification({
       agencyId: agencyId || null,
       subAccountId: subaccountId || null,
       userId: find_user.id,
-      notification: `${find_user.name}(${role}) | ${description}`,
+      notification: `${find_user.name} | ${description}`,
     });
 
     return true;
@@ -133,4 +120,20 @@ export const getMedia = async (id: string) => {
     console.log(err);
     return null;
   }
+};
+
+export const rateLimitter = async ({
+  limit = 3,
+  duration = 25,
+  identifier,
+}: {
+  limit?: number;
+  duration?: number;
+  identifier?: string;
+}) => {
+  const header = await headers();
+  const ip = header.get("x-forwarded-for") as string;
+  const rateLimitter = await rateLimit({ limit, duration });
+  const { success } = await rateLimitter.limit(identifier || ip);
+  if (!success) throw new TooManyRequest();
 };

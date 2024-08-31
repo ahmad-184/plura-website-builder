@@ -6,9 +6,8 @@ import { AccountsSkeleton, SidebarOptionsSkeleton } from "./loading-fallbacks";
 import SidebarMenuOptions from "./sidebar-menu-options";
 import { Agency, SubAccount, User } from "@prisma/client";
 import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/actions/user";
 import { db } from "@/lib/db";
-import { returnUserDataUseCase } from "@/lib/use-case";
+import { getCurrentUser } from "@/actions/auth";
 
 export default async function SidebarContent({
   id,
@@ -35,10 +34,6 @@ export default async function SidebarContent({
   });
 
   if (!getAllNeededData) return redirect("/");
-
-  const userData: User = returnUserDataUseCase(getAllNeededData);
-
-  if (!userData) return redirect("/");
 
   const details: Agency | SubAccount | null | undefined =
     type === "agency"
@@ -73,7 +68,7 @@ export default async function SidebarContent({
       <SidebarLogo id={id} type={type} logo={logo} />
       <Suspense fallback={<AccountsSkeleton />}>
         <SidebarAccountsMenu
-          user={userData}
+          user={user}
           type={type}
           details={details}
           agencyDetails={agencyDetails}

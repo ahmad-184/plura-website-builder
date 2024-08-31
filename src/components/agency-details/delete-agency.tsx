@@ -3,7 +3,6 @@ import { AlertOctagonIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import ButtonWithLoaderAndProgress from "../ButtonWithLoaderAndProgress";
 import { Input } from "../ui/input";
-import CustomDialog from "../custom/custom-dialog";
 import { Agency } from "@prisma/client";
 import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -22,15 +21,19 @@ import { useMutation } from "@tanstack/react-query";
 export default function DeleteAgency({ data }: { data: Partial<Agency> }) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [error, setError] = useState(false);
-  const router = useRouter();
 
   const { mutate: deleteAgency, isPending } = useMutation({
     mutationFn: deleteAgencyAction,
     onSuccess: () => {
-      toast.success("Agency goal updated");
-      router.replace("/agency");
+      toast.success("Success", {
+        description: "Agency deleted successfully",
+        icon: "🎉",
+      });
+      window.location.replace("/agency");
     },
-    onError: () => toast.error("Could not update agency goal"),
+    onError: (e) => {
+      toast.error("Error", { description: e.message, icon: "🛑" });
+    },
   });
 
   const handleDelete = async () => {

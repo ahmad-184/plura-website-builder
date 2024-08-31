@@ -38,6 +38,7 @@ const SelectRole = ({
                 <SelectItem value="AGENCY_OWNER">Agency Owner</SelectItem>
               )}
               <SelectItem value="AGENCY_ADMIN">Agency Admin</SelectItem>
+              <SelectItem value="SUBACCOUNT_ADMIN">Subaccount Admin</SelectItem>
               <SelectItem value="SUBACCOUNT_USER">Subaccount User</SelectItem>
               <SelectItem value="SUBACCOUNT_GUEST">Subaccount Guest</SelectItem>
             </SelectContent>

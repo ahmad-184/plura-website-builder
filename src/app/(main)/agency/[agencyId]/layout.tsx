@@ -1,4 +1,3 @@
-import { auth } from "@clerk/nextjs/server";
 import { notFound, redirect } from "next/navigation";
 import Unauthorized from "../_components/unauthorized";
 import Sidebar from "@/components/sidebar";
@@ -16,7 +15,7 @@ export default async function Layout({
   children: React.ReactNode;
   params: { agencyId: string };
 }) {
-  auth().protect();
+  const user = await protectAgencyRoute();
 
   if (!params.agencyId) return redirect("/agency");
 
@@ -24,11 +23,10 @@ export default async function Layout({
 
   if (!agency_exist) return notFound();
 
-  const user = await protectAgencyRoute();
-
-  if (!user) return redirect("/agency");
-
-  if (user.role !== "AGENCY_OWNER" && user.role !== "AGENCY_ADMIN")
+  if (
+    (user.role !== "AGENCY_OWNER" && user.role !== "AGENCY_ADMIN") ||
+    user.agencyId !== params.agencyId
+  )
     return <Unauthorized />;
 
   return (

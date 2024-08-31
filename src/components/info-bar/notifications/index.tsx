@@ -1,8 +1,8 @@
 import { getNotificationsByType } from "@/actions/notification";
 import { SidebarType } from "@/types";
-import { getCurrentUser } from "@/actions/user";
 import NotificationsSheet from "./notifications-sheet";
 import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/actions/auth";
 
 export default async function Notifications({
   type,
@@ -14,13 +14,15 @@ export default async function Notifications({
   const notifs = await getNotificationsByType(type, id);
   if (notifs === null) return redirect("/agency");
   const user = await getCurrentUser();
-  const role = user?.privateMetadata.role as string;
+
+  if (!user) return redirect("/sign-in");
+  if (!user.role) return redirect("/agency");
 
   return (
     <NotificationsSheet
       data={JSON.parse(JSON.stringify(notifs))}
       type={type}
-      role={role}
+      role={user.role}
       notifs_length={notifs.length}
       id={id}
     />

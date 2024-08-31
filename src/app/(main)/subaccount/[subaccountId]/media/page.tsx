@@ -2,9 +2,8 @@ import PageWrapper from "@/components/page-wrapper";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Suspense } from "react";
 import GetMediaBucketData from "./get-media-bucket-data";
-import UploadMediaButton from "../../_components/upload-media-button";
+import UploadMediaButton from "./_components/upload-media-button";
 import { protectSubaccountRoute } from "@/actions/auth";
-import AnimateFadeIn from "@/components/animate/animate-fade-in";
 
 export const revalidate = 60;
 
@@ -13,19 +12,17 @@ export default async function Page({
 }: {
   params: { subaccountId: string };
 }) {
-  await protectSubaccountRoute();
+  await protectSubaccountRoute(params.subaccountId);
 
   return (
     <PageWrapper>
       <div className="flex w-full flex-col gap-5">
-        <AnimateFadeIn>
-          <div className="flex justify-between ap-4 items-start">
-            <h1 className="text-3xl font-semibold tracking-tight">
-              Media Bucket
-            </h1>
-            <UploadMediaButton subaccountId={params.subaccountId} />
-          </div>
-        </AnimateFadeIn>
+        <div className="flex justify-between ap-4 items-start">
+          <h1 className="text-3xl font-semibold tracking-tight">
+            Media Bucket
+          </h1>
+          <UploadMediaButton subaccountId={params.subaccountId} />
+        </div>
         <Suspense
           fallback={
             <div className="flex w-full gap-5">
@@ -38,9 +35,7 @@ export default async function Page({
             </div>
           }
         >
-          <AnimateFadeIn>
-            <GetMediaBucketData subaccountId={params.subaccountId} />
-          </AnimateFadeIn>
+          <GetMediaBucketData subaccountId={params.subaccountId} />
         </Suspense>
       </div>
     </PageWrapper>

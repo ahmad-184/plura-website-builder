@@ -48,7 +48,7 @@ export default async function SidebarMenuOptions({
                     <SheetClose className="w-full">
                       <CommandItem
                         className="md:w-[320px] w-full
-                    aria-selected:bg-primary/70 aria-selected:text-white
+                    aria-selected:bg-primary aria-selected:text-white
                     "
                       >
                         <div

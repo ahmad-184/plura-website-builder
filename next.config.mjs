@@ -15,6 +15,7 @@ const withPWA = withPWAInit({
 });
 
 export default withPWA({
+  reactStrictMode: false,
   images: {
     remotePatterns: [
       {
@@ -28,6 +29,14 @@ export default withPWA({
       {
         protocol: "https",
         hostname: "res.cloudinary.com",
+      },
+      {
+        protocol: "https",
+        hostname: "dashboard.clerk.com",
+      },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
       },
     ],
   },

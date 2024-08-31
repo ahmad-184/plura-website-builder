@@ -1,4 +1,3 @@
-import { getCurrentUserData } from "@/actions/user";
 import { SidebarType } from "@/types";
 import {
   Card,
@@ -8,11 +7,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import UserDetails from "@/components/user-details";
-import { redirect } from "next/navigation";
+import { validateUser } from "@/actions/auth";
 
 export default async function UserSettings({ type }: { type: SidebarType }) {
-  const user = await getCurrentUserData();
-  if (!user) return redirect("/");
+  const user = await validateUser();
 
   return (
     <Card>

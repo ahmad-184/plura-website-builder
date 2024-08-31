@@ -1,13 +1,15 @@
 import { cn } from "@/lib/utils";
 import { SidebarType } from "@/types";
-import { UserButton } from "@clerk/nextjs";
 import { Suspense } from "react";
 import Notifications from "./notifications";
 import { Skeleton } from "../ui/skeleton";
 import { ModeToggle } from "../mode-toggle";
+import { getCurrentUser } from "@/actions/auth";
+import { redirect } from "next/navigation";
+import AuthUserAvatar from "../auth-user-avatar";
 
 const NotificationFallback = () => {
-  return <Skeleton className="w-[33px] h-[33px] rounded-full" />;
+  return <Skeleton className="w9 h-9 rounded-full" />;
 };
 
 export default async function InfoBar({
@@ -19,6 +21,9 @@ export default async function InfoBar({
   id: string;
   className?: string;
 }) {
+  const user = await getCurrentUser();
+  if (!user) return redirect("/sign-in");
+
   return (
     <div
       className={cn(
@@ -29,12 +34,10 @@ export default async function InfoBar({
       <div className="w-full h-full flex items-center justify-end">
         {/* <BackButton /> */}
         <div className="flex items-center gap-2">
-          <UserButton
-            appearance={{
-              elements: {
-                avatarBox: "w-[33px] h-[33px]",
-              },
-            }}
+          <AuthUserAvatar
+            src={user.avatarUrl}
+            className="w-9 h-9"
+            alt="user avatar"
           />
           <Suspense fallback={<NotificationFallback />}>
             <Notifications type={type} id={id} />

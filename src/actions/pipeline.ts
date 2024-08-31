@@ -1,6 +1,16 @@
 "use server";
 
 import { db } from "@/lib/db";
+import { cookies } from "next/headers";
+
+export const setPipelineIdInCookie = async (id: string) => {
+  if (!id) return;
+  cookies().set({
+    name: "pipeline_id",
+    value: id,
+  });
+  return true;
+};
 
 export const findFirstPipelineBysubaccountId = async (subaccountId: string) => {
   try {

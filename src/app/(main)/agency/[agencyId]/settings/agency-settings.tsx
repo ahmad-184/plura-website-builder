@@ -1,5 +1,5 @@
 import { getAgency } from "@/actions/agency";
-import { getCurrentUser } from "@/actions/user";
+import { protectAgencyRoute } from "@/actions/auth";
 import AgencyDetails from "@/components/agency-details";
 import {
   Card,
@@ -16,9 +16,9 @@ export default async function AgencySettings({
   agencyId: string;
 }) {
   const agenycData = await getAgency(agencyId);
-  const user = await getCurrentUser();
+  const user = await protectAgencyRoute();
 
-  if (!agenycData || !user) return redirect("/");
+  if (!agenycData) return redirect("/");
 
   return (
     <Card>

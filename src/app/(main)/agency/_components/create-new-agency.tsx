@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-export default function CreateNewAgecny({
+export default function CreateNewAgency({
   companyEmail,
 }: {
   companyEmail: string;

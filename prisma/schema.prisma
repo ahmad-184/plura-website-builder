@@ -11,6 +11,7 @@ generator client {
 enum Role {
     AGENCY_OWNER
     AGENCY_ADMIN
+    SUBACCOUNT_ADMIN
     SUBACCOUNT_USER
     SUBACCOUNT_GUEST
 }
@@ -48,21 +49,56 @@ enum Icon {
     clipboardIcon
 }
 
+model Session {
+    id        String   @id
+    userId    String
+    expiresAt DateTime
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+}
+
+enum AccountType {
+    GOOGLE
+    PASSWORD
+}
+
+model Account {
+    id            String      @id @default(uuid())
+    userId        String      @unique
+    user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+    password      String?
+    emailVerified Boolean?    @default(false)
+    type          AccountType
+
+    @@index([userId])
+}
+
 model User {
     id           String         @id @default(uuid())
     name         String
-    avatarUrl    String
+    avatarUrl    String         @default("https://dashboard.clerk.com/_next/image?url=https%3A%2F%2Fimg.clerk.com%2Fpreview.png%3Fsize%3D144%26seed%3D1723502897887%26initials%3DAD%26isSquare%3Dtrue%26bgType%3Dmarble%26bgColor%3D4797ff%26fgType%3Dsilhouette%26fgColor%3DFFFFFF%26type%3Duser&w=96&q=75")
     email        String         @unique
     createdAt    DateTime       @default(now())
     updatedAt    DateTime       @updatedAt
-    role         Role           @default(SUBACCOUNT_USER)
+    role         Role?
     agencyId     String?
-    Agency       Agency?        @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+    Agency       Agency?        @relation(fields: [agencyId], references: [id], onDelete: Restrict)
     Permissions  Permissions[]
     Ticket       Ticket[]
     Notification Notification[]
+    Account      Account?
+    Session      Session[]
 
     @@index([agencyId])
+}
+
+model verifyEmailOtp {
+    id       String   @id @unique @default(uuid())
+    userId   String   @unique
+    otp      String   @unique
+    expireAt DateTime
 }
 
 model Permissions {
@@ -78,12 +114,13 @@ model Permissions {
 }
 
 model Agency {
-    id               String                @id @default(uuid())
+    id               String                @id @unique @default(uuid())
     connectAccountId String?               @default("")
     customerId       String                @default("")
     name             String
+    ownerId          String
     agencyLogo       String
-    companyEmail     String
+    companyEmail     String                @unique
     companyPhone     String
     whiteLabel       Boolean               @default(true)
     address          String
@@ -134,20 +171,6 @@ model SubAccount {
     @@index([agencyId])
 }
 
-model Tag {
-    id           String   @id @default(uuid())
-    name         String
-    color        String
-    createdAt    DateTime @default(now())
-    updatedAt    DateTime @updatedAt
-    subAccountId String
-
-    SubAccount SubAccount @relation(fields: [subAccountId], references: [id], onDelete: Cascade)
-    Ticket     Ticket[]
-
-    @@index([subAccountId])
-}
-
 model Pipeline {
     id           String     @id @default(uuid())
     name         String
@@ -181,7 +204,7 @@ model Ticket {
     laneId      String
     order       Int      @default(0)
     Lane        Lane     @relation(fields: [laneId], references: [id], onDelete: Cascade)
-    value       Decimal?
+    value       String?
     description String?
     Tags        Tag[]
 
@@ -194,6 +217,20 @@ model Ticket {
     @@index([laneId])
     @@index([customerId])
     @@index([assignedUserId])
+}
+
+model Tag {
+    id           String   @id @default(uuid())
+    name         String
+    color        String
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+    subAccountId String
+
+    SubAccount SubAccount @relation(fields: [subAccountId], references: [id], onDelete: Cascade)
+    Ticket     Ticket[]
+
+    @@index([subAccountId])
 }
 
 enum TriggerTypes {
@@ -262,7 +299,7 @@ model Action {
 model Contact {
     id           String   @id @default(uuid())
     name         String
-    email        String
+    email        String   @unique
     createdAt    DateTime @default(now())
     updatedAt    DateTime @updatedAt
     subAccountId String
@@ -327,6 +364,7 @@ model FunnelPage {
     content      String?
     order        Int
     previewImage String?
+    published    Boolean  @default(false)
     funnelId     String
     Funnel       Funnel   @relation(fields: [funnelId], references: [id], onDelete: Cascade)
 

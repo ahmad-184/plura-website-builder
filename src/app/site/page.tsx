@@ -12,12 +12,11 @@ import { cn } from "@/lib/utils";
 import { Check } from "lucide-react";
 import Link from "next/link";
 import { dynamicImage } from "@/lib/dynamic-image";
-import { env } from "@/env";
 
 export default async function Page() {
-  const { blurDataURL, src } = await dynamicImage({
-    url: `${env.NEXT_PUBLIC_URL}assets/preview.png`,
-  });
+  // const { blurDataURL, src } = await dynamicImage({
+  //   url: `${process.env.NEXT_PUBLIC_URL}assets/preview.png`,
+  // });
 
   return (
     <>
@@ -36,23 +35,23 @@ export default async function Page() {
               [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)]
               "
           />
-          <p className="text-center z-10 relative bottom-5 md:bottom-0">
+          <p className="text-center z-10 relative bottom-5 md:bottom-0 select-none">
             Run your agency, in one place
           </p>
           <div className="bg-gradient-to-r from-primary to-secondary-foreground text-transparent bg-clip-text relative">
-            <h1 className="text-9xl font-bold text-center md:text-[300px]">
+            <h1 className="text-9xl font-bold text-center md:text-[300px] select-none">
               Plura
             </h1>
           </div>
           <div className="flex justify-center items-center relative md:mt-[-70px]">
             <Image
-              src={src}
+              src={"/assets/preview.png"}
               alt="plura preview workspace"
               height={1200}
               width={1200}
-              placeholder="blur"
-              blurDataURL={blurDataURL}
-              className="rounded-tl-2xl rounded-tr-2xl border-2 border-muted"
+              // placeholder="blur"
+              // blurDataURL={blurDataURL}
+              className="rounded-tl-2xl rounded-tr-2xl"
             />
             <div className="bottom-0 top-[50%] bg-gradient-to-t dark:from-background left-0 right-0 absolute z-10"></div>
           </div>

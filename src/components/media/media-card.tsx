@@ -34,11 +34,16 @@ export default function MediaCard({ data }: { data: Media }) {
   const { mutate: deleteMedia, isPending } = useMutation({
     mutationFn: deleteMediaAction,
     onSuccess: () => {
-      toast.success("Media deleted");
+      toast.success("Success", {
+        description: "Media deleted successfully",
+        icon: "🎉",
+      });
       setOpen(false);
       router.refresh();
     },
-    onError: () => toast.error("Could not delete media"),
+    onError: (e) => {
+      toast.error("Error", { description: e.message, icon: "🛑" });
+    },
   });
 
   const handleDelete = async () => {
@@ -49,7 +54,7 @@ export default function MediaCard({ data }: { data: Media }) {
   return (
     <AlertDialog onOpenChange={setOpen} open={open}>
       <DropdownMenu>
-        <article className="border w-full rounded-lg bg-slate-900">
+        <article className="border w-full rounded-lg dark:bg-slate-900 bg-white">
           <div className="relative w-full h-52">
             <Image
               src={data.link}
@@ -63,7 +68,7 @@ export default function MediaCard({ data }: { data: Media }) {
             <p className="text-muted-foreground text-xs">
               {fDate(data.createdAt)}
             </p>
-            <p>{data.name}</p>
+            <p className="text-gray-900 dark:text-gray-100">{data.name}</p>
             <div className="absolute top-4 right-4 p-[1px] cursor-pointer ">
               <DropdownMenuTrigger>
                 <MoreHorizontalIcon

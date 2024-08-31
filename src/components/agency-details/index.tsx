@@ -1,7 +1,7 @@
 "use client";
 
 import { v4 as uuid4 } from "uuid";
-import { Agency } from "@prisma/client";
+import { Agency, User } from "@prisma/client";
 import {
   Form,
   FormControl,
@@ -14,10 +14,9 @@ import {
 import { useForm } from "react-hook-form";
 import DropzoneComponent from "../dropzone";
 import FormInput from "../custom/form-input";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Switch } from "../ui/switch";
 import ButtonWithLoaderAndProgress from "../ButtonWithLoaderAndProgress";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { NumberInput } from "@tremor/react";
 
@@ -27,14 +26,12 @@ import { cn } from "@/lib/utils";
 import { PhoneInput } from "../custom/phone-input";
 import {
   createAgencyAction,
-  initUserAction,
   updateAgencyAction,
   updateGoalAction,
 } from "@/actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { agencyDetailFormSchema } from "@/zod";
-import { User } from "@clerk/nextjs/server";
 import { agencyFormSchemaType } from "@/types";
 import { useMutation } from "@tanstack/react-query";
 
@@ -79,46 +76,48 @@ export default function AgencyDetails({
   const { mutate: createAgency, isPending: createAgencyPending } = useMutation({
     mutationFn: createAgencyAction,
     onSuccess: () => {
-      toast.success("Agency created");
-      window.location.reload();
+      toast.success("Success", {
+        description: "Your agency successfully Created",
+        icon: "🎉",
+      });
+      router.refresh();
     },
-    onError: () => toast.error("Could not create agency"),
+    onError: (e) =>
+      toast.error("Error", { description: e.message, icon: "🛑" }),
   });
 
   const { mutate: updateGoal, isPending: updateGoalPending } = useMutation({
     mutationFn: updateGoalAction,
     onSuccess: () => {
-      toast.success("Agency goal updated");
+      toast.success("Success", {
+        description: "Goal updated",
+        icon: "🎉",
+      });
       router.refresh();
     },
-    onError: () => toast.error("Could not update agency goal"),
+    onError: (e) =>
+      toast.error("Error", { description: e.message, icon: "🛑" }),
   });
 
   const { mutate: updateAgency, isPending: updateAgencyPending } = useMutation({
     mutationFn: updateAgencyAction,
     onSuccess: () => {
-      toast.success("Agency information updated");
+      toast.success("Success", {
+        description: "Agency information updated",
+        icon: "🎉",
+      });
       router.refresh();
     },
-    onError: () => toast.error("Could not update agency information"),
+    onError: (e) =>
+      toast.error("Error", { description: e.message, icon: "🛑" }),
   });
 
   const handleSubmitForm = async (formData: agencyFormSchemaType) => {
-    try {
-      if (!data?.id) {
-        const stripe_cust_data = {
-          email: formData.companyEmail,
-          name: formData.name,
-          shipping: {
-            address: {
-              city: formData.city,
-              country: formData.country,
-              linel: formData.address,
-              postal_code: formData.zipCode,
-              state: formData.zipCode,
-            },
-            name: formData.name,
-          },
+    if (!data?.id) {
+      const stripe_cust_data = {
+        email: formData.companyEmail,
+        name: formData.name,
+        shipping: {
           address: {
             city: formData.city,
             country: formData.country,
@@ -126,33 +125,32 @@ export default function AgencyDetails({
             postal_code: formData.zipCode,
             state: formData.zipCode,
           },
-        };
+          name: formData.name,
+        },
+        address: {
+          city: formData.city,
+          country: formData.country,
+          linel: formData.address,
+          postal_code: formData.zipCode,
+          state: formData.zipCode,
+        },
+      };
 
-        const custId = "fake-id-for-now";
+      const custId = "fake-id-for-now";
 
-        if (!custId) return;
+      if (!custId) return;
 
-        const agencyId = uuid4();
+      const agencyId = uuid4();
 
-        const new_user = await initUserAction({
-          role: "AGENCY_OWNER",
-          agencyId,
-        });
-
-        if (!new_user) return toast.error("Something went wrong");
-
-        await createAgency({
-          ...formData,
-          customerId: custId,
-          id: agencyId,
-        });
-      } else if (data?.id) {
-        await updateAgency({ ...formData, id: data.id });
-        return;
-      }
-    } catch (err) {
-      console.log(err);
-      toast.error("Somthing went wrong");
+      createAgency({
+        ...formData,
+        customerId: custId,
+        id: agencyId,
+        user_role: "AGENCY_OWNER",
+      });
+    } else if (data?.id) {
+      updateAgency({ ...formData, id: data.id });
+      return;
     }
   };
 
@@ -328,7 +326,7 @@ export default function AgencyDetails({
           ) : null}
           <ButtonWithLoaderAndProgress
             type="submit"
-            className={cn("mt-2")}
+            className={cn("mt-2 w-fit")}
             variant={"default"}
             loading={isLoading}
             disabled={isLoading}
@@ -337,7 +335,7 @@ export default function AgencyDetails({
           </ButtonWithLoaderAndProgress>
         </form>
       </Form>
-      {data?.id && user && user.privateMetadata.role === "AGENCY_OWNER" ? (
+      {data?.id && user && user.role === "AGENCY_OWNER" ? (
         <div>
           <Separator className="mb-7" />
           <div className="w-full">

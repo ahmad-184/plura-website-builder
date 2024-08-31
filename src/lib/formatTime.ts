@@ -1,7 +1,5 @@
 import { format, getTime, formatDistanceToNow } from "date-fns";
 
-// ----------------------------------------------------------------------
-
 export function fullDate(date: Date | string) {
   return format(new Date(date), "MM/dd/yyyy");
 }

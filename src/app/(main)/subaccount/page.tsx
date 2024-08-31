@@ -1,11 +1,12 @@
 import { verifyAndAcceptInvitationAction } from "@/actions";
 import Unauthorized from "../agency/_components/unauthorized";
-import {
-  findASubaccountWithUserAccess,
-  getCurrentUserData,
-} from "@/actions/user";
+import { findASubaccountWithUserAccess } from "@/actions/user";
 import { redirect } from "next/navigation";
-import { auth } from "@clerk/nextjs/server";
+import {
+  getCurrentUser,
+  protectSubaccountRoute,
+  validateUser,
+} from "@/actions/auth";
 
 export const revalidate = 60;
 
@@ -14,21 +15,18 @@ export default async function page({
 }: {
   searchParams: { state: string; code: string };
 }) {
-  auth().protect();
+  const user = await validateUser();
 
   let agencyId: string | null = null;
 
   try {
-    agencyId = await verifyAndAcceptInvitationAction();
+    const res = await verifyAndAcceptInvitationAction();
+    if (res) agencyId = res;
   } catch (err) {
     console.log(err);
   }
 
   if (!agencyId) return <Unauthorized />;
-
-  const user = await getCurrentUserData();
-
-  if (!user) return <Unauthorized />;
 
   const permission = await findASubaccountWithUserAccess(user.email);
 

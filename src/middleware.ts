@@ -1,8 +1,6 @@
-import { clerkMiddleware } from "@clerk/nextjs/server";
-import { env } from "./env";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export default clerkMiddleware(async (auth, req) => {
+export default function middlware(req: NextRequest) {
   const url = req.nextUrl;
   const searchParams = url.searchParams.toString();
   let hostname = req.headers;
@@ -14,7 +12,7 @@ export default clerkMiddleware(async (auth, req) => {
   // if subdomain exist
   const customSubdomain = hostname
     .get("host")
-    ?.split(`${env.NEXT_PUBLIC_DOMAIN}`)
+    ?.split(`${process.env.NEXT_PUBLIC_DOMAIN}`)
     .filter(Boolean)[0];
 
   if (customSubdomain)
@@ -27,7 +25,7 @@ export default clerkMiddleware(async (auth, req) => {
 
   if (
     url.pathname === "/" ||
-    (url.pathname === "site" && url.host === env.NEXT_PUBLIC_DOMAIN)
+    (url.pathname === "site" && url.host === process.env.NEXT_PUBLIC_DOMAIN)
   )
     return NextResponse.redirect(new URL("/site", req.url));
 
@@ -36,7 +34,7 @@ export default clerkMiddleware(async (auth, req) => {
     url.pathname.startsWith("/subaccount")
   )
     return NextResponse.rewrite(new URL(`${pathWithSearchParams}`, req.url));
-});
+}
 
 export const config = {
   matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],

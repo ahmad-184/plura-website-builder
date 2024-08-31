@@ -8,8 +8,8 @@ export default function PageWrapper({
   className?: string;
 }) {
   return (
-    <div className="w-full flex justify-center">
-      <div className={cn("w-full max-w-[800px]", className)}>{children}</div>
+    <div className="w-full h-full flex justify-center">
+      <div className={cn("w-full max-w-[1000px]", className)}>{children}</div>
     </div>
   );
 }

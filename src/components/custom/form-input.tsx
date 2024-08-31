@@ -19,6 +19,7 @@ export default function FormInput({
   className,
   readOnly,
   disabled,
+  type,
 }: {
   control: any;
   placeholder?: string;
@@ -29,6 +30,7 @@ export default function FormInput({
   className?: string;
   readOnly?: boolean;
   disabled?: boolean;
+  type?: React.HTMLInputTypeAttribute;
 }) {
   return (
     <FormField
@@ -43,10 +45,11 @@ export default function FormInput({
               placeholder={placeholder}
               {...field}
               readOnly={readOnly || false}
+              {...(type && { type })}
             />
           </FormControl>
           {description && <FormDescription>{description}</FormDescription>}
-          {message && <FormMessage>{message}</FormMessage>}
+          {message ? <FormMessage>{message}</FormMessage> : <FormMessage />}
         </FormItem>
       )}
     />

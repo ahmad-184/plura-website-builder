@@ -26,6 +26,8 @@ export default function NotificationsList({
   notifs_length,
   setLength,
   id,
+  setCurrentAgencyNotfs,
+  currentAgencyNotfs,
 }: {
   data: NotificationsType;
   type: SidebarType;
@@ -33,12 +35,13 @@ export default function NotificationsList({
   notifs_length: number;
   setLength: (num: number) => void;
   id: string;
+  setCurrentAgencyNotfs: (e: boolean) => void;
+  currentAgencyNotfs: boolean;
 }) {
   const [notifications, setNotifications] = useState<DataType | []>([]);
 
   useEffect(() => {
-    const res = packNotificationsByDate(data);
-    setNotifications(res);
+    setNotifications(packNotificationsByDate(data));
   }, [data]);
 
   useEffect(() => {
@@ -65,17 +68,8 @@ export default function NotificationsList({
             <Card className="p-4 flex items-center justify-between">
               <p>Agency notifications</p>
               <Switch
-                defaultChecked={false}
-                onCheckedChange={(e) => {
-                  if (e) {
-                    const filtered = data.filter(
-                      (e) => e.agencyId === id && e.subAccountId === null
-                    );
-                    setNotifications(packNotificationsByDate(filtered));
-                  } else {
-                    setNotifications(packNotificationsByDate(data));
-                  }
-                }}
+                onCheckedChange={setCurrentAgencyNotfs}
+                checked={currentAgencyNotfs}
               />
             </Card>
           </SheetDescription>

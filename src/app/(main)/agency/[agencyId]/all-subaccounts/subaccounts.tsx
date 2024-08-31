@@ -15,6 +15,7 @@ import { getUserPermissions } from "@/actions/user";
 import { redirect } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { protectAgencyRoute } from "@/actions/auth";
+import { User } from "@prisma/client";
 
 export const SubaccountsSkeleton = () => {
   return (
@@ -26,10 +27,15 @@ export const SubaccountsSkeleton = () => {
   );
 };
 
-export default async function Subaccounts({ agencyId }: { agencyId: string }) {
+export default async function Subaccounts({
+  agencyId,
+  user,
+}: {
+  agencyId: string;
+  user: User;
+}) {
   const subaccounts = await getAgencySubAccounts(agencyId);
 
-  const user = await protectAgencyRoute();
   if (!user) return redirect("/agency");
 
   const user_permissions = await getUserPermissions(user.email);

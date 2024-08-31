@@ -5,6 +5,7 @@ import ClientEnvironmentVars, {
 import { Toaster } from "@/components/ui/sonner";
 import ModalProvider from "./model-providers";
 import QueryClientProvider from "./query-client-provider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 export const Providers = ({
   children,
@@ -27,7 +28,9 @@ export const Providers = ({
           enableSystem
           disableTransitionOnChange
         >
-          <ModalProvider>{children}</ModalProvider>
+          <TooltipProvider>
+            <ModalProvider>{children}</ModalProvider>
+          </TooltipProvider>
           <Toaster />
         </ThemeProvider>
       </ClientEnvironmentVars>

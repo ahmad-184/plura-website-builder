@@ -30,12 +30,15 @@ export default function DeleteSubaccountButton({
   const { mutate: deleteSubaccount, isPending } = useMutation({
     mutationFn: deleteSubaccountAction,
     onSuccess: () => {
-      toast.success("Subaccount deleted successfully");
+      toast.success("Success", {
+        description: "Subaccount deleted successfully",
+        icon: "🎉",
+      });
       setOpen(false);
       router.refresh();
     },
-    onError: () => {
-      toast.success("Could not delete subaccount");
+    onError: (e) => {
+      toast.error("Error", { description: e.message, icon: "🛑" });
     },
   });
 

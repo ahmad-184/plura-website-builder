@@ -12,18 +12,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { useMutation } from "@tanstack/react-query";
 import { createPipelineSchemaType } from "@/types";
 import { useMemo } from "react";
+import { RealtimeChannel } from "@supabase/supabase-js";
 
 const CreateUpdatePipeline = ({
   subaccountId,
   setClose,
   pipelineDetails,
+  channel,
+  updateOnePipline,
 }: {
   subaccountId: string;
   setClose?: (e: boolean) => void;
   pipelineDetails?: Pipeline;
+  channel: RealtimeChannel | null;
+  updateOnePipline: (pipeline: Partial<Pipeline>) => void;
 }) => {
   const router = useRouter();
-
   const form = useForm<createPipelineSchemaType>({
     resolver: zodResolver(createPipelineSchema),
     defaultValues: {
@@ -36,41 +40,62 @@ const CreateUpdatePipeline = ({
     mutationFn: createPipelineAction,
     onSuccess: (e) => {
       if (e) {
-        toast.success("New pipeline created");
+        toast.success("Success", {
+          description: "New pipeline created",
+          icon: "🎉",
+        });
         if (setClose) setClose(false);
+        if (channel) {
+          channel.send({
+            type: "broadcast",
+            event: "pipeline:updated",
+            payload: "pipelines details updated",
+          });
+        }
         router.refresh();
         router.push(`/subaccount/${subaccountId}/pipelines/${e.id}`);
       }
     },
-    onError: () => toast.error("Could not create pipeline"),
+    onError: (e) => {
+      toast.error("Error", { description: e.message, icon: "🛑" });
+    },
   });
 
   const { mutate: updatePipeline, isPending: updateLoading } = useMutation({
     mutationFn: updatePipelineAction,
     onSuccess: (e) => {
       if (e) {
-        toast.success("Pipeline information updated");
+        toast.success("Success", {
+          description: "Pipeline information updated",
+          icon: "🎉",
+        });
+        updateOnePipline(e);
         if (setClose) setClose(false);
+        if (channel) {
+          channel.send({
+            type: "broadcast",
+            event: "pipeline:updated",
+            payload: "pipelines details updated",
+          });
+        }
         router.refresh();
       }
     },
-    onError: () => toast.error("Could not update pipeline information"),
+    onError: (e) => {
+      toast.error("Error", { description: e.message, icon: "🛑" });
+    },
   });
 
   const onSubmit = async (values: createPipelineSchemaType) => {
     if (!subaccountId) return;
 
-    try {
-      if (pipelineDetails?.id) {
-        updatePipeline({
-          ...values,
-          id: pipelineDetails.id,
-        });
-      } else {
-        createPipeline(values);
-      }
-    } catch (err) {
-      console.log(err);
+    if (pipelineDetails?.id) {
+      updatePipeline({
+        ...values,
+        id: pipelineDetails.id,
+      });
+    } else {
+      createPipeline(values);
     }
   };
 
@@ -102,6 +127,7 @@ const CreateUpdatePipeline = ({
             <ButtonWithLoaderAndProgress
               loading={isLoading}
               disabled={isLoading}
+              className="w-fit"
             >
               {pipelineDetails?.id ? "Update Information" : "Create Pipeline"}
             </ButtonWithLoaderAndProgress>

@@ -11,7 +11,7 @@ const UserAvatar = ({
   className?: string;
 }) => {
   return (
-    <div className="h-11 w-11 relative flex-none">
+    <div className="h-9 w-9 relative flex-none">
       <Image
         src={src}
         fill

@@ -41,20 +41,21 @@ export default function UploadMediaForm({
   const { mutate: createMedia, isPending } = useMutation({
     mutationFn: createMediaAction,
     onSuccess: () => {
-      toast.success("Media created");
+      toast.success("Success", {
+        description: "New media created",
+        icon: "🎉",
+      });
       form.reset();
       router.refresh();
     },
-    onError: () => toast.error("Could not create media"),
+    onError: (e) => {
+      toast.error("Error", { description: e.message, icon: "🛑" });
+    },
   });
 
   const onSubmit = async (values: uploadMediaFormSchemaType) => {
-    try {
-      if (!subaccountId) return;
-      createMedia(values);
-    } catch (err) {
-      console.log(err);
-    }
+    if (!subaccountId) return;
+    createMedia(values);
   };
 
   return (

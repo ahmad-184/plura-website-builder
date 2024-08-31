@@ -3,8 +3,7 @@ import Sidebar from "@/components/sidebar";
 import BlurPage from "@/components/blur-page";
 import InfoBar from "@/components/info-bar";
 import { getSubaccountWithAccessWithIdAndEmail } from "@/actions/subaccount";
-import { getCurrentUser } from "@/actions/user";
-import { auth } from "@clerk/nextjs/server";
+import { protectSubaccountRoute } from "@/actions/auth";
 
 export const revalidate = 60;
 
@@ -15,16 +14,13 @@ export default async function Layout({
   children: React.ReactNode;
   params: { subaccountId: string };
 }) {
-  auth().protect();
-
-  const user = await getCurrentUser();
-  if (!user) return redirect("/");
+  const user = await protectSubaccountRoute(params.subaccountId);
 
   if (!params.subaccountId) return redirect("/subaccount");
 
   const subaccount_exist = await getSubaccountWithAccessWithIdAndEmail(
     params.subaccountId,
-    user.emailAddresses[0].emailAddress
+    user.email
   );
 
   if (!subaccount_exist?.SubAccount) return redirect("/agency");

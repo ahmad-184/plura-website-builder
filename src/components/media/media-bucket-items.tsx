@@ -29,7 +29,7 @@ export default function MediaBucketItems({
           <div className="w-full flex flex-wrap justify-between py-4">
             {data?.Media.map((e) => (
               <CommandItem
-                className="p-0 w-full sm:w-[49%] mb-3 rounded-lg !bg-transparent !font-medium
+                className="p-0 w-full sm:w-[49%] lg:w-[32%] mb-3 rounded-lg !bg-transparent !font-medium
             !text-white
             "
               >

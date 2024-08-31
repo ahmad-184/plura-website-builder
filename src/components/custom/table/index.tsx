@@ -30,7 +30,7 @@ interface DataTableProps<TData, TValue>
   extends React.HTMLAttributes<HTMLDivElement> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  header_action_btn: React.ReactNode;
+  header_action_btn?: React.ReactNode;
   filterValue: string;
 }
 

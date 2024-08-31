@@ -77,22 +77,32 @@ export default function SubAccountDetails({
     useMutation({
       mutationFn: createSubAccountAction,
       onSuccess: () => {
-        toast.success("Account created");
+        toast.success("Success", {
+          description: "Account created successfully",
+          icon: "🎉",
+        });
         router.refresh();
         if (isOpen) setClose();
       },
-      onError: () => toast.error("Could not create Account"),
+      onError: (e) => {
+        toast.error("Error", { description: e.message, icon: "🛑" });
+      },
     });
 
   const { mutate: updateSubaccount, isPending: updateSubaccountPending } =
     useMutation({
       mutationFn: updateSubAccountAction,
       onSuccess: () => {
-        toast.success("Account information updated");
+        toast.success("Success", {
+          description: "Account information updated",
+          icon: "🎉",
+        });
         router.refresh();
         if (isOpen) setClose();
       },
-      onError: () => toast.error("Could not update Account information"),
+      onError: (e) => {
+        toast.error("Error", { description: e.message, icon: "🛑" });
+      },
     });
 
   const isLoading = useMemo(() => {
@@ -102,27 +112,22 @@ export default function SubAccountDetails({
 
   const handleSubmitForm = async (formData: formSchemaType) => {
     console.log("clicked");
-    if (!agencyId) return toast.success("agency id required");
-    try {
-      if (!data?.id) {
-        const subAccountId = uuid4();
-        createSubAccount({
-          ...formData,
-          id: subAccountId,
-          agencyId: agencyId,
-        });
-      }
+    if (!agencyId) return toast.success("Agency id required");
+    if (!data?.id) {
+      const subAccountId = uuid4();
+      createSubAccount({
+        ...formData,
+        id: subAccountId,
+        agencyId: agencyId,
+      });
+    }
 
-      if (data?.id) {
-        await updateSubaccount({
-          ...formData,
-          id: data.id,
-          agencyId: agencyId,
-        });
-      }
-    } catch (err) {
-      console.log(err);
-      toast.error("Somthing went wrong");
+    if (data?.id) {
+      await updateSubaccount({
+        ...formData,
+        id: data.id,
+        agencyId: agencyId,
+      });
     }
   };
 
@@ -145,7 +150,7 @@ export default function SubAccountDetails({
                 name="subAccountLogo"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Agency logo</FormLabel>
+                    <FormLabel>Account logo</FormLabel>
                     <FormControl>
                       <DropzoneComponent
                         maxSize={1}
@@ -235,7 +240,7 @@ export default function SubAccountDetails({
               />
               <ButtonWithLoaderAndProgress
                 type="submit"
-                className={cn("mt-2")}
+                className={cn("mt-2 w-fit")}
                 variant={"default"}
                 disabled={isLoading}
                 loading={isLoading}

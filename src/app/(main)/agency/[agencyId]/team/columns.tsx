@@ -10,8 +10,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Prisma } from "@prisma/client";
-import { getAgencyTeamMember, getCurrentUser } from "@/actions/user";
+import { Prisma, User } from "@prisma/client";
+import { getAgencyTeamMember } from "@/actions/user";
 import UserAvatar from "@/components/user-avatar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -33,15 +33,15 @@ import {
 } from "@/components/ui/alert-dialog";
 import Loader from "@/components/loader";
 import { useRouter } from "next/navigation";
-import { deleteUserAction } from "@/actions";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
-import { User } from "@clerk/nextjs/server";
 import { useModal } from "@/providers/model-providers";
 import CustomDialog from "@/components/custom/custom-dialog";
 import UserDetails from "@/components/user-details";
 import { getCurrentUserSubaccounts } from "@/actions/subaccount";
 import { useMutation } from "@tanstack/react-query";
+import { getCurrentUser } from "@/actions/auth";
+import { removeUserAccessToAgencyAction } from "@/actions";
 
 export type TeamMemberscolumnsProps = Prisma.PromiseReturnType<
   typeof getAgencyTeamMember
@@ -143,15 +143,18 @@ const CellAction = ({ data }: { data: TeamMemberscolumnsProps }) => {
 
   const { setOpen: openModal } = useModal();
 
-  const { mutate: deleteUser, isPending } = useMutation({
-    mutationFn: deleteUserAction,
+  const { mutate: removeUser, isPending } = useMutation({
+    mutationFn: removeUserAccessToAgencyAction,
     onSuccess: () => {
-      toast.success("User deleted successfully");
+      toast.success("Success", {
+        description: "User deleted successfully",
+        icon: "🎉",
+      });
       router.refresh();
       setOpen(false);
     },
-    onError: () => {
-      toast.success("Could not delete User");
+    onError: (e) => {
+      toast.error("Error", { description: e.message, icon: "🛑" });
     },
   });
 
@@ -164,7 +167,7 @@ const CellAction = ({ data }: { data: TeamMemberscolumnsProps }) => {
 
   const handleDeleteUser = async () => {
     if (!data?.id) return;
-    deleteUser({
+    removeUser({
       userId: data.id,
     });
   };
@@ -190,8 +193,11 @@ const CellAction = ({ data }: { data: TeamMemberscolumnsProps }) => {
             Copy email
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          {currentUser?.privateMetadata.role !== "AGENCY_OWNER" &&
-          data?.role === "AGENCY_OWNER" ? null : (
+          {(currentUser?.role !== "AGENCY_OWNER" &&
+            data?.role === "AGENCY_OWNER") ||
+          currentUser?.id === data?.id ||
+          (currentUser?.role === "AGENCY_ADMIN" &&
+            data?.role === "AGENCY_ADMIN") ? null : (
             <DropdownMenuItem
               className="flex gap-2"
               onClick={() => {
@@ -207,8 +213,7 @@ const CellAction = ({ data }: { data: TeamMemberscolumnsProps }) => {
                               user={data}
                               type="agency"
                               have_permission={
-                                currentUser?.privateMetadata.role ===
-                                "AGENCY_OWNER"
+                                currentUser?.role === "AGENCY_OWNER"
                               }
                             />
                           </>
@@ -218,7 +223,7 @@ const CellAction = ({ data }: { data: TeamMemberscolumnsProps }) => {
                   ),
                   fetchData: async () => {
                     if (
-                      currentUser?.privateMetadata.role === "AGENCY_OWNER" &&
+                      currentUser?.role === "AGENCY_OWNER" &&
                       currentUser.id !== data?.id
                     ) {
                       return {
@@ -235,7 +240,8 @@ const CellAction = ({ data }: { data: TeamMemberscolumnsProps }) => {
               Edit details
             </DropdownMenuItem>
           )}
-          {data?.role !== "AGENCY_OWNER" && currentUser?.id !== data?.id ? (
+          {currentUser?.role === "AGENCY_OWNER" &&
+          currentUser?.id !== data?.id ? (
             <>
               <AlertDialogTrigger asChild>
                 <DropdownMenuItem className="flex gap-2">

@@ -15,7 +15,7 @@ export default function DropzoneComponent({
   max_file?: number;
   maxSize?: number;
   getValue: (url: string) => void;
-  value?: string;
+  value?: string | null | undefined;
 }) {
   const [filesPreview, setFilesPreview] = useState<
     (File & { preview: string })[]
@@ -90,7 +90,7 @@ export default function DropzoneComponent({
   }, [files]);
 
   return (
-    <section className="w-full border dark:border-gray-700 dark:bg-gray-800 bg-gray-100 rounded-lg h-[200px] p-5">
+    <section className="w-full border dark:border-gray-700 dark:bg-gray-800 bg-gray-100 rounded-lg h-[200px]">
       <div
         style={{ width: "100%", height: "100%" }}
         {...getRootProps({ className: "dropzone" })}

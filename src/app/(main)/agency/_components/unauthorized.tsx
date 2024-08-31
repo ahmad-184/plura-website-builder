@@ -8,7 +8,7 @@ type Props = {};
 const Unauthorized = (props: Props) => {
   return (
     <div className="p-4 text-center h-screen w-screen flex justify-center items-center flex-col">
-      <h1 className="text-3xl md:text-6xl text-gray-200">
+      <h1 className="text-3xl md:text-6xl dark:text-gray-200">
         Unauthorized acccess!
       </h1>
       <p className="mb-5 dark:text-gray-500">

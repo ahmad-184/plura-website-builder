@@ -1,8 +1,9 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { getCurrentUser } from "./user";
 import { redirect } from "next/navigation";
+import { getCurrentUser, validateUser } from "./auth";
+import { Role } from "@prisma/client";
 
 export const getSubAccount = async (id: string) => {
   try {
@@ -72,7 +73,7 @@ export const getCurrentUserSubaccounts = async () => {
     const user = await getCurrentUser();
     if (!user) return redirect("/");
     const subs = await db.permissions.findMany({
-      where: { email: user.emailAddresses[0].emailAddress },
+      where: { email: user.email },
       include: {
         SubAccount: true,
       },

@@ -1,5 +1,48 @@
 import { z } from "zod";
 
+export const signUpFormSchema = z
+  .object({
+    name: z.string().min(1),
+    email: z.string().email(),
+    password: z
+      .string()
+      .min(8, { message: "password must have more than 8 characteres" }),
+    passwordConfirmation: z.string().min(8),
+  })
+  .refine((data) => data.password === data.passwordConfirmation, {
+    message: "Passwords don't match",
+    path: ["passwordConfirmation"],
+  });
+
+export const verifyEmailFormSchema = z.object({
+  otp: z.string().max(6),
+  userId: z.string(),
+});
+
+export const signInFormSchema = z.object({
+  email: z.string().email().min(1),
+  password: z
+    .string()
+    .min(8, { message: "password must have more than 8 characteres" }),
+});
+
+export const forgotPasswordFormSchema = z.object({
+  email: z.string().email().min(1),
+});
+
+export const resetPasswordFormSchema = z
+  .object({
+    password: z
+      .string()
+      .min(8, { message: "password must have more than 8 characteres" }),
+    passwordConfirmation: z.string().min(8),
+    token: z.string(),
+  })
+  .refine((data) => data.password === data.passwordConfirmation, {
+    message: "Passwords don't match",
+    path: ["passwordConfirmation"],
+  });
+
 export const agencyDetailFormSchema = z.object({
   agencyLogo: z.string().min(1),
   companyEmail: z.string().email().min(1),
@@ -33,6 +76,7 @@ export const userDetailsFormSchema = z.object({
   role: z.enum([
     "AGENCY_OWNER",
     "AGENCY_ADMIN",
+    "SUBACCOUNT_ADMIN",
     "SUBACCOUNT_USER",
     "SUBACCOUNT_GUEST",
   ]),
@@ -40,7 +84,12 @@ export const userDetailsFormSchema = z.object({
 
 export const sendInvitationSchema = z.object({
   email: z.string().email().min(1),
-  role: z.enum(["AGENCY_ADMIN", "SUBACCOUNT_USER", "SUBACCOUNT_GUEST"]),
+  role: z.enum([
+    "AGENCY_ADMIN",
+    "SUBACCOUNT_ADMIN",
+    "SUBACCOUNT_USER",
+    "SUBACCOUNT_GUEST",
+  ]),
 });
 
 export const uploadMediaFormSchema = z.object({
@@ -60,7 +109,11 @@ export const deletePipelineActionSchema = z.object({
 });
 
 export const createAgencyActionSchema = agencyDetailFormSchema.and(
-  z.object({ customerId: z.string(), id: z.string() })
+  z.object({
+    customerId: z.string(),
+    id: z.string(),
+    user_role: z.enum(["AGENCY_OWNER"]),
+  })
 );
 
 export const updateAgencyActionSchema = agencyDetailFormSchema.and(
@@ -78,7 +131,7 @@ export const deleteSubaccountActionSchema = z.object({
   subaccountId: z.string(),
 });
 
-export const deleteUserActionSchema = z.object({
+export const removeUserAccessToAgencyActionSchema = z.object({
   userId: z.string(),
 });
 
@@ -114,6 +167,7 @@ export const updateUserActionSchema = z.object({
   role: z.enum([
     "AGENCY_OWNER",
     "AGENCY_ADMIN",
+    "SUBACCOUNT_ADMIN",
     "SUBACCOUNT_USER",
     "SUBACCOUNT_GUEST",
   ]),
@@ -133,8 +187,145 @@ export const initUserActionSchema = z.object({
   role: z.enum([
     "AGENCY_OWNER",
     "AGENCY_ADMIN",
+    "SUBACCOUNT_ADMIN",
     "SUBACCOUNT_USER",
     "SUBACCOUNT_GUEST",
   ]),
   agencyId: z.string(),
+});
+
+export const createLineFormSchema = z.object({
+  name: z.string().min(1),
+  pipelineId: z.string().min(1),
+  subaccountId: z.string().min(1),
+});
+
+export const updateLineFormSchema = z.object({
+  laneId: z.string().min(1),
+  name: z.string().min(1),
+  subaccountId: z.string().min(1),
+});
+
+export const deleteLaneActionSchema = z.object({
+  laneId: z.string().min(1),
+  subaccountId: z.string().min(1),
+});
+
+const currencyNumberRegex = /^\d+(\.\d{1,2})?$/;
+export const ticketFormSchema = z.object({
+  laneId: z.string().min(1),
+  subaccountId: z.string().min(1),
+  name: z.string().min(1),
+  description: z.string().min(1),
+  value: z
+    .string()
+    .refine((value) => currencyNumberRegex.test(value), {
+      message: "Value must be a valid price.",
+    })
+    .nullable(),
+  customerId: z.string().optional().nullable(),
+  assignedUserId: z.string().optional().nullable(),
+});
+
+export const updateTicketSchema = z.object({
+  id: z.string().min(1),
+  laneId: z.string().min(1),
+  subaccountId: z.string().min(1),
+  name: z.string().min(1),
+  description: z.string().min(1),
+  value: z
+    .string()
+    .refine((value) => currencyNumberRegex.test(value), {
+      message: "Value must be a valid price.",
+    })
+    .nullable(),
+  customerId: z.string().optional().nullable(),
+  assignedUserId: z.string().optional().nullable(),
+});
+
+export const createTagSchema = z.object({
+  name: z.string().min(1),
+  subaccountId: z.string().min(1),
+  color: z.enum(["BLUE", "ORANGE", "ROSE", "PURPLE", "GREEN"]),
+});
+
+export const deleteTagSchema = z.object({
+  id: z.string().min(1),
+});
+
+export const deleteTicketSchema = z.object({
+  id: z.string().min(1),
+  subaccountId: z.string().min(1),
+});
+
+export const contactFormSchema = z.object({
+  subaccountId: z.string().min(1),
+  name: z.string().min(1),
+  email: z.string().email().min(1),
+});
+
+export const createContactFormSchema = z.object({
+  subaccountId: z.string().min(1),
+  name: z.string().min(1),
+  email: z.string().email().min(1),
+});
+
+export const updateContactFormSchema = z.object({
+  subaccountId: z.string().min(1),
+  name: z.string().min(1),
+  email: z.string().email().min(1),
+  id: z.string().min(1),
+});
+
+export const deleteContactFormSchema = z.object({
+  subaccountId: z.string().min(1),
+  id: z.string().min(1),
+});
+
+export const funnelFormSchema = z.object({
+  subaccountId: z.string().min(1),
+  name: z.string().min(1),
+  description: z.string().min(1).nullable(),
+  subDomainName: z.string().min(1),
+  favicon: z.string().min(1).nullable(),
+});
+
+export const updateFunnelFormSchema = z.object({
+  id: z.string().min(1),
+  subaccountId: z.string().min(1),
+  name: z.string().min(1),
+  description: z.string().min(1).nullable(),
+  subDomainName: z.string().min(1),
+  favicon: z.string().min(1).nullable(),
+});
+
+export const deleteFunnelActionSchema = z.object({
+  subaccountId: z.string().min(1),
+  funnelId: z.string().min(1),
+});
+
+export const funnelPageFormSchema = z.object({
+  funnelId: z.string().min(1),
+  subaccountId: z.string().min(1),
+  name: z.string().min(1),
+  pathName: z.string().nullable(),
+});
+
+export const updateFunnelPageFormSchema = z.object({
+  id: z.string().min(1),
+  subaccountId: z.string().min(1),
+  funnelId: z.string().min(1),
+  name: z.string().min(1),
+  pathName: z.string().nullable(),
+  order: z.number(),
+});
+
+export const createCopyFunnelPageFormSchema = z.object({
+  page_id: z.string(),
+  subaccountId: z.string().min(1),
+});
+
+export const deleteFunnelPageFormSchema = z.object({
+  funnelPageId: z.string().min(1),
+  subaccountId: z.string().min(1),
 });
