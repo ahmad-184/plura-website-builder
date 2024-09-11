@@ -128,7 +128,14 @@ const FunnelDetails = ({
                   <FormItem>
                     <FormLabel>Description</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="description..." {...field} />
+                      <Textarea
+                        placeholder="description..."
+                        value={field.value || ""}
+                        disabled={field.disabled}
+                        name={field.name}
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
+                      />
                     </FormControl>
                   </FormItem>
                 )}
