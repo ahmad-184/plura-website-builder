@@ -4,7 +4,7 @@ export const addOneElement = (
   elements: EditorElement[],
   payload: ActionsTypes["addElement"]
 ): EditorElement[] | [] => {
-  const updatedElements = elements.map((el) => {
+  const updatedElements = elements?.map((el) => {
     if (el.id === payload.containerId && Array.isArray(el.content)) {
       return {
         ...el,
@@ -25,7 +25,7 @@ export const updateOneElement = (
   elements: EditorElement[],
   payload: ActionsTypes["updateElement"]
 ): EditorElement[] | [] => {
-  const updatedElements = elements.map((el) => {
+  const updatedElements = elements?.map((el) => {
     if (el.id === payload.elementDetails.id) {
       return { ...el, ...payload.elementDetails };
     } else if (el.content && Array.isArray(el.content)) {
@@ -43,11 +43,13 @@ export const deleteOneElement = (
   elements: EditorElement[],
   payload: ActionsTypes["deleteElement"]
 ): EditorElement[] | [] => {
-  const updatedElements = elements.filter((el) => {
+  const updatedElements = elements?.filter((el) => {
     if (el.id === payload.elementDetails.id) {
       return false;
     } else if (el.content && Array.isArray(el.content)) {
+      console.log("checked");
       el.content = deleteOneElement(el.content, payload);
+      return true;
     } else return true;
   });
 

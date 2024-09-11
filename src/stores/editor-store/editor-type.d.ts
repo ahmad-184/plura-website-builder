@@ -1,4 +1,4 @@
-import { FunnelPage } from "@prisma/client";
+import { FunnelPage, User } from "@prisma/client";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { WritableDraft } from "immer";
 
@@ -24,7 +24,13 @@ export type EditorElement = {
   classnames: string;
   name: string;
   type: EditorBtns;
-  content: EditorElement[] | {};
+  content:
+    | EditorElement[]
+    | {
+        href?: string;
+        innerText?: string;
+        src?: string;
+      };
 };
 
 export type Editor = {
@@ -48,6 +54,7 @@ export type EditorState = {
   pageDetails: FunnelPage | null;
   history: HistoryState;
   channel: RealtimeChannel | null;
+  onlineUsers: User[];
 };
 
 export type ActionsTypes = {
@@ -56,7 +63,7 @@ export type ActionsTypes = {
     elementDetails: EditorElement;
   };
   updateElement: { elementDetails: EditorElement };
-  deleteElement: { elementDetails: EditorElement };
+  deleteElement: { elementDetails: Partial<EditorElement> };
   changeClickedElement: {
     elementDetails?:
       | EditorElement
@@ -74,17 +81,20 @@ export type ActionsTypes = {
   toggleLiveMode: { value: boolean };
   redo: void;
   undo: void;
-  loadData: {
+  loadData: Partial<{
     elements: EditorElement[];
     withLive: boolean;
     subaccountId: string;
     funnelId: string;
     pageDetails: FunnelPage | null;
-  };
+  }>;
   setFunnelPageId: { funnelPageId: string };
   loadHistory: { funnelPageId: string };
   setChannel: {
     channel: RealtimeChannel | null;
+  };
+  setOnlineUsers: {
+    users: User[];
   };
 };
 
@@ -102,4 +112,5 @@ export type EditorActions = {
   setFunnelPageId: (payload: ActionsTypes["setFunnelPageId"]) => void;
   // loadHistory: (payload: ActionsTypes["loadHistory"]) => void;
   setChannel: (payload: ActionsTypes["setChannel"]) => void;
+  setOnlineUsers: (payload: ActionsTypes["setOnlineUsers"]) => void;
 };

@@ -12,6 +12,29 @@ export const setPipelineIdInCookie = async (id: string) => {
   return true;
 };
 
+export const getPipelinesWithAllDataWithSubaccountId = async (
+  subaccountId: string
+) => {
+  try {
+    const res = await db.pipeline.findMany({
+      where: {
+        subAccountId: subaccountId,
+      },
+      include: {
+        Lane: {
+          include: {
+            Tickets: true,
+          },
+        },
+      },
+    });
+    return res;
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+};
+
 export const findFirstPipelineBysubaccountId = async (subaccountId: string) => {
   try {
     const res = await db.pipeline.findFirst({

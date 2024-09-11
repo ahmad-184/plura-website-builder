@@ -42,6 +42,7 @@ export const initialState: EditorState = {
   pageDetails: null,
   history: initialHistoryState,
   channel: null,
+  onlineUsers: [],
 };
 
 export const createEditorStore = (initState: EditorState = initialState) => {
@@ -101,10 +102,11 @@ export const createEditorStore = (initState: EditorState = initialState) => {
                 type: null,
               }
             : state.editor.selectedElement;
-          state.editor.elements = deleteOneElement(
+          const filteredElements = deleteOneElement(
             state.editor.elements,
             payload
           );
+          state.editor.elements = filteredElements;
           state.history.history = [
             ...state.history.history.slice(0, state.history.currentIndex + 1),
             { ...state.editor },
@@ -117,9 +119,9 @@ export const createEditorStore = (initState: EditorState = initialState) => {
         produce((state: EditorState) => {
           state.editor.elements =
             payload.elements || initilEditorState.elements;
-          state.subaccountId = payload.subaccountId;
-          state.pageDetails = payload.pageDetails;
-          state.funnelId = payload.funnelId;
+          state.subaccountId = payload?.subaccountId || state.subaccountId;
+          state.pageDetails = payload?.pageDetails || state.pageDetails;
+          state.funnelId = payload?.funnelId || state.funnelId;
           state.editor.liveMode = Boolean(payload.withLive);
         })
       ),
@@ -199,6 +201,12 @@ export const createEditorStore = (initState: EditorState = initialState) => {
             { ...state.editor },
           ];
           state.history.currentIndex = state.history.history.length - 1;
+        })
+      ),
+    setOnlineUsers: (payload) =>
+      set(
+        produce((state: EditorState) => {
+          state.onlineUsers = payload.users;
         })
       ),
   }));

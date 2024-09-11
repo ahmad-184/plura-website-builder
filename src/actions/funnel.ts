@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db";
 import { PublicError, returnError } from "@/lib/errors";
-import { FunnelPage } from "@prisma/client";
+import { Funnel, FunnelPage } from "@prisma/client";
 
 export const getFunnel = async (id: string) => {
   try {
@@ -12,6 +12,23 @@ export const getFunnel = async (id: string) => {
     return res;
   } catch (err) {
     console.log(err);
+    return returnError(err as Error);
+  }
+};
+
+export const updateFunnelDetails = async (data: Partial<Funnel>) => {
+  try {
+    const id = data?.id;
+    if (!id) throw new PublicError("Funnel id required");
+    const res = await db.funnel.update({
+      where: { id },
+      data: {
+        ...data,
+      },
+    });
+
+    return res;
+  } catch (err) {
     return returnError(err as Error);
   }
 };
@@ -52,7 +69,11 @@ export const getSubaccountFunnels = async (subaccountId: string) => {
     const res = await db.funnel.findMany({
       where: { subAccountId: subaccountId },
       include: {
-        FunnelPages: true,
+        FunnelPages: {
+          orderBy: {
+            order: "asc",
+          },
+        },
       },
     });
     return res;
@@ -102,8 +123,25 @@ export const updateFunnelPageDetails = async (data: Partial<FunnelPage>) => {
     if (!id) throw new PublicError("Page id required");
     const res = await db.funnelPage.update({
       where: { id },
+      // @ts-ignore
       data: {
         ...data,
+      },
+    });
+
+    return res;
+  } catch (err) {
+    return returnError(err as Error);
+  }
+};
+
+export const getDomainDetails = async (subDomainName: string) => {
+  try {
+    if (!subDomainName) throw new PublicError("Domain name required");
+    const res = await db.funnel.findFirst({
+      where: { subDomainName },
+      include: {
+        FunnelPages: true,
       },
     });
 

@@ -15,7 +15,7 @@ export default async function Page({
   await protectSubaccountRoute(params.subaccountId);
 
   return (
-    <PageWrapper>
+    <PageWrapper className="max-w-[1172px]">
       <div className="flex w-full flex-col gap-5">
         <div className="flex justify-between ap-4 items-start">
           <h1 className="text-3xl font-semibold tracking-tight">

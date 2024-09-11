@@ -2,8 +2,7 @@
 
 import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
-import { getCurrentUser, validateUser } from "./auth";
-import { Role } from "@prisma/client";
+import { getCurrentUser } from "./auth";
 
 export const getSubAccount = async (id: string) => {
   try {

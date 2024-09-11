@@ -17,5 +17,3 @@ export default async function Layout({
 
   return <>{children}</>;
 }
-
-// ("/give @p command_block");

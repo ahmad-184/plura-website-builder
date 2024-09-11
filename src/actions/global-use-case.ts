@@ -108,6 +108,20 @@ export const getSubaccountAndMedia = async (subaccountId: string) => {
   }
 };
 
+export const getSubaccountMedias = async (subaccountId: string) => {
+  try {
+    const res = await db.media.findMany({
+      where: {
+        subAccountId: subaccountId,
+      },
+    });
+    return res;
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+};
+
 export const getMedia = async (id: string) => {
   try {
     const res = await db.media.findUnique({
