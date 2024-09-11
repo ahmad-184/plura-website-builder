@@ -1,6 +1,7 @@
 "use client";
 
 import { deleteFunnelAction } from "@/actions";
+import { getCurrentUser } from "@/actions/auth";
 import ButtonWithLoaderAndProgress from "@/components/ButtonWithLoaderAndProgress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
@@ -14,7 +15,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { OctagonAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -29,6 +30,11 @@ export default function DeleteFunnel({
 }) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
+
+  const { data: user } = useQuery({
+    queryFn: () => getCurrentUser(),
+    queryKey: ["current-user"],
+  });
 
   const { mutate: deleteFunnel, isPending } = useMutation({
     mutationFn: deleteFunnelAction,
@@ -53,6 +59,13 @@ export default function DeleteFunnel({
     if (!funnelId || !subaccountId) return;
     deleteFunnel({ funnelId, subaccountId });
   };
+
+  if (
+    !user ||
+    user.role === "SUBACCOUNT_USER" ||
+    user.role === "SUBACCOUNT_GUEST"
+  )
+    return null;
 
   return (
     <AlertDialog onOpenChange={setOpen} open={open}>

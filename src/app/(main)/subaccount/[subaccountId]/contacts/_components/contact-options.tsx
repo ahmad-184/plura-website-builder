@@ -61,8 +61,9 @@ export default function ContactOptions({ contact }: { contact: Contact }) {
           description: "Contact deleted",
           icon: "🎉",
         });
-        router.refresh();
         setClose();
+        setOpen(false);
+        router.refresh();
       }
     },
     onError: (e) => {
