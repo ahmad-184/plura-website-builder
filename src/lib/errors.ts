@@ -67,4 +67,7 @@ export const returnError = (err: Error) => {
   if (err instanceof PublicError) {
     throw new Error(err.message);
   }
+  if (err instanceof Error) {
+    throw new Error(err.message);
+  }
 };

@@ -28,7 +28,7 @@ export async function generateMetadata({
 
 export default async function Page({ params }: { params: { domain: string } }) {
   const data = await getDomainDetails(params.domain.split(".")[0]);
-
+  console.log(params.domain.split(".")[0]);
   if (!data || !data.published) return notFound();
 
   const page = data.FunnelPages.find((e) => !e.pathName);

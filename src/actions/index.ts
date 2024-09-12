@@ -1418,6 +1418,23 @@ export const createFunnelAction = AuthenticatedAction(
       if (user.role === "SUBACCOUNT_GUEST" || user.role === "SUBACCOUNT_USER")
         throw new AccesssibilityError();
 
+      const hasUppercase =
+        data.subDomainName !== data.subDomainName.toLowerCase();
+      if (hasUppercase)
+        throw new PublicError(
+          "Sub domain name can not have uppercase characters"
+        );
+
+      const subdomain_exist = await db.funnel.findUnique({
+        where: {
+          subDomainName: data.subDomainName,
+        },
+      });
+      if (subdomain_exist)
+        throw new PublicError(
+          "A sub domain already exist with this sub domain name"
+        );
+
       const res = await db.funnel.create({
         data: {
           name: data.name,
@@ -1453,6 +1470,26 @@ export const updateFunnelAction = AuthenticatedAction(
 
       const funnel_exist = await getFunnel(data.id);
       if (!funnel_exist) throw new PublicError("Funnel dos not exist");
+
+      const hasUppercase =
+        data.subDomainName !== data.subDomainName.toLowerCase();
+
+      if (hasUppercase)
+        throw new PublicError(
+          "Sub domain name can not have uppercase characters"
+        );
+
+      if (funnel_exist.subDomainName !== data.subDomainName) {
+        const subdomain_exist = await db.funnel.findUnique({
+          where: {
+            subDomainName: data.subDomainName,
+          },
+        });
+        if (subdomain_exist)
+          throw new PublicError(
+            "A sub domain already exist with this sub domain name"
+          );
+      }
 
       const res = await db.funnel.update({
         where: { id: funnel_exist.id },
