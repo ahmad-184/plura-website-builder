@@ -75,41 +75,47 @@ export default function AgencyDetails({
 
   const { mutate: createAgency, isPending: createAgencyPending } = useMutation({
     mutationFn: createAgencyAction,
-    onSuccess: () => {
-      toast.success("Success", {
-        description: "Your agency successfully Created",
-        icon: "🎉",
-      });
-      router.refresh();
+    onSuccess: (e) => {
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
+        toast.success("Success", {
+          description: "Your agency successfully Created",
+          icon: "🎉",
+        });
+        router.refresh();
+      }
     },
-    onError: (e) =>
-      toast.error("Error", { description: e.message, icon: "🛑" }),
   });
 
   const { mutate: updateGoal, isPending: updateGoalPending } = useMutation({
     mutationFn: updateGoalAction,
-    onSuccess: () => {
-      toast.success("Success", {
-        description: "Goal updated",
-        icon: "🎉",
-      });
-      router.refresh();
+    onSuccess: (e) => {
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
+        toast.success("Success", {
+          description: "Goal updated",
+          icon: "🎉",
+        });
+        router.refresh();
+      }
     },
-    onError: (e) =>
-      toast.error("Error", { description: e.message, icon: "🛑" }),
   });
 
   const { mutate: updateAgency, isPending: updateAgencyPending } = useMutation({
     mutationFn: updateAgencyAction,
-    onSuccess: () => {
-      toast.success("Success", {
-        description: "Agency information updated",
-        icon: "🎉",
-      });
-      router.refresh();
+    onSuccess: (e) => {
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
+        toast.success("Success", {
+          description: "Agency information updated",
+          icon: "🎉",
+        });
+        router.refresh();
+      }
     },
-    onError: (e) =>
-      toast.error("Error", { description: e.message, icon: "🛑" }),
   });
 
   const handleSubmitForm = async (formData: agencyFormSchemaType) => {

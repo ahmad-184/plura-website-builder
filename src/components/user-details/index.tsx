@@ -66,16 +66,18 @@ export default function UserDetails({
   const { mutate: updateUser, isPending: updateUserPending } = useMutation({
     mutationFn: async (e: userDetailsFormType) => {
       if (!user || !user.id) throw new Error("User id required");
-      const res = await updateUserAction(e);
-      if (!res) throw new Error("Could not update user information");
-      return res;
+      const { data, error } = await updateUserAction(e);
+      if (!data || error) throw new Error("Could not update user information");
+      return data;
     },
-    onSuccess: () => {
-      toast.success("Success", {
-        description: "User information updated",
-        icon: "🎉",
-      });
-      router.refresh();
+    onSuccess: (e) => {
+      if (e) {
+        toast.success("Success", {
+          description: "User information updated",
+          icon: "🎉",
+        });
+        router.refresh();
+      }
     },
     onError: (e) => {
       toast.error("Error", { description: e.message, icon: "🛑" });
@@ -95,15 +97,16 @@ export default function UserDetails({
   const { mutate: changeUserPermission, isPending: changePermissionPending } =
     useMutation({
       mutationFn: changeUserPermissionAction,
-      onSuccess: () => {
-        toast.success("Success", {
-          description: "Permission changed successfully",
-          icon: "🎉",
-        });
-        return router.refresh();
-      },
-      onError: (e) => {
-        toast.error("Error", { description: e.message, icon: "🛑" });
+      onSuccess: (e) => {
+        if (e.error)
+          return toast.error("Error", { description: e.error, icon: "🛑" });
+        if (e.data) {
+          toast.success("Success", {
+            description: "Permission changed successfully",
+            icon: "🎉",
+          });
+          return router.refresh();
+        }
       },
     });
 

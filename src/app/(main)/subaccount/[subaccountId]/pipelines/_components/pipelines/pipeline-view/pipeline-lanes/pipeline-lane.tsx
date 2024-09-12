@@ -16,7 +16,6 @@ import { Draggable, Droppable } from "react-beautiful-dnd";
 import DeleteLane from "./delete-lane";
 import UpdateLane from "./update-lane";
 import CreateTicket from "./create-ticket";
-import { usePipelineStore } from "@/providers/pipeline-store-provider";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import PipelineTicket from "./pipeline-ticket";
 

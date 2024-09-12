@@ -1,7 +1,6 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { returnError } from "@/lib/errors";
 
 export const getSubaccountContacts = async (subaccountId: string) => {
   try {
@@ -12,6 +11,7 @@ export const getSubaccountContacts = async (subaccountId: string) => {
     });
     return res;
   } catch (err) {
-    return returnError(err as Error);
+    console.log(err);
+    return null;
   }
 };

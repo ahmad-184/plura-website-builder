@@ -1,7 +1,6 @@
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { memo } from "react";
 import { User } from "@prisma/client";
 
 interface CustomAvatarProps {

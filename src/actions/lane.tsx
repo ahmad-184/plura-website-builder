@@ -1,7 +1,6 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { returnError } from "@/lib/errors";
 import { Lane } from "@prisma/client";
 
 export const getPipelineLanesWithAllData = async (pipelineId: string) => {
@@ -51,6 +50,7 @@ export const updateLaneOrder = async (lanes: Lane[]) => {
 
     return "Done";
   } catch (err) {
-    return returnError(err as Error);
+    console.log(err);
+    return null;
   }
 };

@@ -40,16 +40,17 @@ export default function UploadMediaForm({
 
   const { mutate: createMedia, isPending } = useMutation({
     mutationFn: createMediaAction,
-    onSuccess: () => {
-      toast.success("Success", {
-        description: "New media created",
-        icon: "🎉",
-      });
-      form.reset();
-      router.refresh();
-    },
-    onError: (e) => {
-      toast.error("Error", { description: e.message, icon: "🛑" });
+    onSuccess: (e) => {
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
+        toast.success("Success", {
+          description: "New media created",
+          icon: "🎉",
+        });
+        form.reset();
+        router.refresh();
+      }
     },
   });
 

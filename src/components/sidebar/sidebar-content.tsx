@@ -4,7 +4,7 @@ import { SidebarType } from "@/types";
 import SidebarAccountsMenu from "./sidebar-accounts-menu";
 import { AccountsSkeleton, SidebarOptionsSkeleton } from "./loading-fallbacks";
 import SidebarMenuOptions from "./sidebar-menu-options";
-import { Agency, SubAccount, User } from "@prisma/client";
+import { Agency, SubAccount } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/actions/auth";

@@ -227,6 +227,17 @@ export const ticketFormSchema = z.object({
   assignedUserId: z.string().optional().nullable(),
 });
 
+export const tagSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  color: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  subAccountId: z.string(),
+});
+
+export const tagsSchema = z.array(tagSchema);
+
 export const updateTicketSchema = z.object({
   id: z.string().min(1),
   laneId: z.string().min(1),

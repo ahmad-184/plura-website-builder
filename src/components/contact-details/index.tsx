@@ -48,7 +48,9 @@ const ContactDetails = ({
   const { mutate: createContact, isPending: createPending } = useMutation({
     mutationFn: createContactAction,
     onSuccess: (e) => {
-      if (e) {
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
         toast.success("Success", {
           description: "Contact created",
           icon: "🎉",
@@ -57,25 +59,21 @@ const ContactDetails = ({
         router.refresh();
       }
     },
-    onError: (e) => {
-      toast.error("Error", { description: e.message, icon: "🛑" });
-    },
     retry: 3,
   });
 
   const { mutate: updateContact, isPending: updatePending } = useMutation({
     mutationFn: updateContactAction,
     onSuccess: (e) => {
-      if (e) {
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
         toast.success("Success", {
           description: "Contact information updated",
           icon: "🎉",
         });
         router.refresh();
       }
-    },
-    onError: (e) => {
-      toast.error("Error", { description: e.message, icon: "🛑" });
     },
     retry: 3,
   });

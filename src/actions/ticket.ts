@@ -1,7 +1,6 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { returnError } from "@/lib/errors";
 import { Ticket } from "@prisma/client";
 
 export const updateTicketOrder = async (tickets: Ticket[]) => {
@@ -20,6 +19,6 @@ export const updateTicketOrder = async (tickets: Ticket[]) => {
 
     await db.$transaction(updates);
   } catch (err) {
-    return returnError(err as Error);
+    console.log(err);
   }
 };

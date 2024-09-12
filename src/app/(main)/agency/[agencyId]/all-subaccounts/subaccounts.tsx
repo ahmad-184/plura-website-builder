@@ -14,7 +14,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { getUserPermissions } from "@/actions/user";
 import { redirect } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { protectAgencyRoute } from "@/actions/auth";
 import { User } from "@prisma/client";
 
 export const SubaccountsSkeleton = () => {

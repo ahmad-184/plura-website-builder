@@ -145,16 +145,17 @@ const CellAction = ({ data }: { data: TeamMemberscolumnsProps }) => {
 
   const { mutate: removeUser, isPending } = useMutation({
     mutationFn: removeUserAccessToAgencyAction,
-    onSuccess: () => {
-      toast.success("Success", {
-        description: "User deleted successfully",
-        icon: "🎉",
-      });
-      router.refresh();
-      setOpen(false);
-    },
-    onError: (e) => {
-      toast.error("Error", { description: e.message, icon: "🛑" });
+    onSuccess: (e) => {
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
+        toast.success("Success", {
+          description: "User deleted successfully",
+          icon: "🎉",
+        });
+        router.refresh();
+        setOpen(false);
+      }
     },
   });
 

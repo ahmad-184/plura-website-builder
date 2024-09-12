@@ -1,8 +1,3 @@
-import {
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
 import { useEditor } from "@/providers/editor-store-provider";
 import { useEffect, useState } from "react";
@@ -13,7 +8,6 @@ export default function Customs({
   handleChangeCustomValues: (e: any) => void;
 }) {
   const selectedElement = useEditor((store) => store.editor.selectedElement);
-  const updateElement = useEditor((store) => store.updateElement);
 
   const [href, setHref] = useState(
     (!Array.isArray(selectedElement.content) && selectedElement.content.href) ||

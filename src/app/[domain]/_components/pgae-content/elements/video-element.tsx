@@ -1,8 +1,5 @@
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { useEditor } from "@/providers/editor-store-provider";
 import { EditorElement } from "@/stores/editor-store/editor-type";
-import { Trash2Icon } from "lucide-react";
 
 export default function VideoElement({ element }: { element: EditorElement }) {
   return (

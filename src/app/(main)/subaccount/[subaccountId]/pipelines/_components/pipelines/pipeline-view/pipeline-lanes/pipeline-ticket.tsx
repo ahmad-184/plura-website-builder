@@ -73,13 +73,14 @@ export default function PipelineTicket({
   const { mutate: deleteTicket, isPending: deleteTicketPending } = useMutation({
     mutationFn: deleteTicketAction,
     onSuccess: (e) => {
-      if (e) {
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
         toast.success("Success", {
           description: "Ticket deleted",
-          //   icon: "🎉",
         });
         setOpen(false);
-        removeOneTicket(e);
+        removeOneTicket(e.data);
         if (channel) {
           channel.send({
             type: "broadcast",
@@ -88,9 +89,6 @@ export default function PipelineTicket({
           });
         }
       }
-    },
-    onError: (e) => {
-      toast.error("Error", { description: e.message, icon: "🛑" });
     },
   });
 

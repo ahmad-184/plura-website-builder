@@ -11,13 +11,8 @@ import {
 import { cn } from "@/lib/utils";
 import { Check } from "lucide-react";
 import Link from "next/link";
-import { dynamicImage } from "@/lib/dynamic-image";
 
 export default async function Page() {
-  // const { blurDataURL, src } = await dynamicImage({
-  //   url: `${process.env.NEXT_PUBLIC_URL}assets/preview.png`,
-  // });
-
   return (
     <>
       <main className="h-full w-full">

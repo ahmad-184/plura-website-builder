@@ -15,7 +15,7 @@ import { forgotPasswordFormSchema } from "@/zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import { forgotPasswordUserAction, signInUserAction } from "@/actions";
+import { forgotPasswordUserAction } from "@/actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -32,16 +32,15 @@ export default function ForgotPassword() {
   const { mutate, isPending } = useMutation({
     mutationFn: forgotPasswordUserAction,
     onSuccess: (e) => {
-      if (e) {
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
         toast.success("Success", {
           description: "Reset password link sent to your email",
           icon: "🎉",
         });
         router.replace("/agency");
       }
-    },
-    onError: (e) => {
-      toast.error("Error", { description: e.message, icon: "🛑" });
     },
   });
 

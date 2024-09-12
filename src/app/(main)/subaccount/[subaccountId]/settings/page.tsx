@@ -21,7 +21,6 @@ export default async function Page({
         user?.role === "AGENCY_ADMIN" ||
         user?.role === "SUBACCOUNT_ADMIN" ? (
           <Suspense fallback={<Skeleton className="w-full h-[800px]" />}>
-            {/* <AgencySettings agencyId={params.agencyId} /> */}
             <SubaccountSettings subaccountId={params.subaccountId} />
           </Suspense>
         ) : null}

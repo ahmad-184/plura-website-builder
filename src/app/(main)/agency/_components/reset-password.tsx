@@ -39,16 +39,15 @@ export default function ResetPassword({ token }: { token: string }) {
   const { mutate: resetPassword, isPending } = useMutation({
     mutationFn: resetPasswordUserAction,
     onSuccess: (e) => {
-      if (e) {
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
         toast.success("Success", {
           description: "Your password changed successfully",
           icon: "🎉",
         });
         router.replace("/agency/sign-in");
       }
-    },
-    onError: (e) => {
-      toast.error("Error", { description: e.message, icon: "🛑" });
     },
   });
 

@@ -1,5 +1,3 @@
-import { TypeIcon } from "lucide-react";
-
 export default function TwoColPlaceholder() {
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();

@@ -36,16 +36,17 @@ export default function MediaCard({ data }: { data: Media }) {
 
   const { mutate: deleteMedia, isPending } = useMutation({
     mutationFn: deleteMediaAction,
-    onSuccess: () => {
-      toast.success("Success", {
-        description: "Media deleted successfully",
-        icon: "🎉",
-      });
-      setOpen(false);
-      router.refresh();
-    },
-    onError: (e) => {
-      toast.error("Error", { description: e.message, icon: "🛑" });
+    onSuccess: (e) => {
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
+        toast.success("Success", {
+          description: "Media deleted successfully",
+          icon: "🎉",
+        });
+        setOpen(false);
+        router.refresh();
+      }
     },
   });
 

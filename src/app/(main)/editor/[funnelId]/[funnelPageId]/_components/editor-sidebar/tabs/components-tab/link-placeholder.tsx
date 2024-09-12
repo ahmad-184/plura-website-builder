@@ -1,4 +1,4 @@
-import { Link2Icon, TypeIcon } from "lucide-react";
+import { Link2Icon } from "lucide-react";
 
 export default function LinkPlaceholder() {
   const handleDragOver = (e: React.DragEvent) => {

@@ -9,7 +9,6 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-  CommandSeparator,
 } from "../ui/command";
 import { PlusCircleIcon, Trash2Icon } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
@@ -59,7 +58,9 @@ const TagsList = ({
   const { mutate: createTag, isPending: createTagPending } = useMutation({
     mutationFn: createTagAction,
     onSuccess: (e) => {
-      if (e) {
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
         toast.success("Success", {
           description: "Tag created",
           icon: "🎉",
@@ -68,25 +69,20 @@ const TagsList = ({
         setSearchText("");
       }
     },
-    onError: (e) => {
-      toast.error("Error", { description: e.message, icon: "🛑" });
-    },
   });
 
   const { mutate: deleteTag, isPending: deleteTagPending } = useMutation({
     mutationFn: deleteTagAction,
     onSuccess: (e) => {
-      if (e) {
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
         toast.success("Success", {
           description: "Tag deleted",
-          //   icon: "🎉",
         });
         setOpen(false);
         refetchTags();
       }
-    },
-    onError: (e) => {
-      toast.error("Error", { description: e.message, icon: "🛑" });
     },
   });
 

@@ -76,32 +76,34 @@ export default function SubAccountDetails({
   const { mutate: createSubAccount, isPending: createSubaccountPending } =
     useMutation({
       mutationFn: createSubAccountAction,
-      onSuccess: () => {
-        toast.success("Success", {
-          description: "Account created successfully",
-          icon: "🎉",
-        });
-        router.refresh();
-        if (isOpen) setClose();
-      },
-      onError: (e) => {
-        toast.error("Error", { description: e.message, icon: "🛑" });
+      onSuccess: (e) => {
+        if (e.error)
+          return toast.error("Error", { description: e.error, icon: "🛑" });
+        if (e.data) {
+          toast.success("Success", {
+            description: "Account created successfully",
+            icon: "🎉",
+          });
+          router.refresh();
+          if (isOpen) setClose();
+        }
       },
     });
 
   const { mutate: updateSubaccount, isPending: updateSubaccountPending } =
     useMutation({
       mutationFn: updateSubAccountAction,
-      onSuccess: () => {
-        toast.success("Success", {
-          description: "Account information updated",
-          icon: "🎉",
-        });
-        router.refresh();
-        if (isOpen) setClose();
-      },
-      onError: (e) => {
-        toast.error("Error", { description: e.message, icon: "🛑" });
+      onSuccess: (e) => {
+        if (e.error)
+          return toast.error("Error", { description: e.error, icon: "🛑" });
+        if (e.data) {
+          toast.success("Success", {
+            description: "Account information updated",
+            icon: "🎉",
+          });
+          router.refresh();
+          if (isOpen) setClose();
+        }
       },
     });
 

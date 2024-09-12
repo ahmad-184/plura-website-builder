@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { PublicError, returnError } from "@/lib/errors";
+import { PublicError } from "@/lib/errors";
 import { Funnel, FunnelPage } from "@prisma/client";
 
 export const getFunnel = async (id: string) => {
@@ -12,7 +12,7 @@ export const getFunnel = async (id: string) => {
     return res;
   } catch (err) {
     console.log(err);
-    return returnError(err as Error);
+    return null;
   }
 };
 
@@ -29,7 +29,8 @@ export const updateFunnelDetails = async (data: Partial<Funnel>) => {
 
     return res;
   } catch (err) {
-    return returnError(err as Error);
+    console.log(err);
+    return null;
   }
 };
 
@@ -41,7 +42,7 @@ export const getFunnelPage = async (id: string) => {
     return res;
   } catch (err) {
     console.log(err);
-    return returnError(err as Error);
+    return null;
   }
 };
 
@@ -60,7 +61,7 @@ export const getFunnelWithPages = async (id: string) => {
     return res;
   } catch (err) {
     console.log(err);
-    return returnError(err as Error);
+    return null;
   }
 };
 
@@ -79,7 +80,7 @@ export const getSubaccountFunnels = async (subaccountId: string) => {
     return res;
   } catch (err) {
     console.log(err);
-    return returnError(err as Error);
+    return null;
   }
 };
 
@@ -94,7 +95,7 @@ export const getSubaccountFunnel = async (subaccountId: string) => {
     return res;
   } catch (err) {
     console.log(err);
-    return returnError(err as Error);
+    return null;
   }
 };
 
@@ -113,7 +114,7 @@ export const updateFunnelPagesOrder = async (pages: FunnelPage[]) => {
 
     await db.$transaction(updates);
   } catch (err) {
-    return returnError(err as Error);
+    console.log(err);
   }
 };
 
@@ -131,7 +132,8 @@ export const updateFunnelPageDetails = async (data: Partial<FunnelPage>) => {
 
     return res;
   } catch (err) {
-    return returnError(err as Error);
+    console.log(err);
+    return null;
   }
 };
 
@@ -147,6 +149,7 @@ export const getDomainDetails = async (subDomainName: string) => {
 
     return res;
   } catch (err) {
-    return returnError(err as Error);
+    console.log(err);
+    return null;
   }
 };

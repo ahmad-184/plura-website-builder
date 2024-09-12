@@ -1,30 +1,21 @@
 "use client";
 
 import ButtonWithLoaderAndProgress from "@/components/ButtonWithLoaderAndProgress";
-import FormInput from "@/components/custom/form-input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
   FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { signUpFormSchemaType, verifyEmailFormSchemaType } from "@/types";
-import { signUpFormSchema, verifyEmailFormSchema } from "@/zod";
+import { verifyEmailFormSchemaType } from "@/types";
+import { verifyEmailFormSchema } from "@/zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import Link from "next/link";
 import { useForm } from "react-hook-form";
-import { registerUserAction, verifyEmailAction } from "@/actions";
+import { verifyEmailAction } from "@/actions";
 import { toast } from "sonner";
 import {
   InputOTP,
@@ -32,7 +23,7 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { ArrowLeft, ChevronLeftIcon } from "lucide-react";
+import { ChevronLeftIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -50,14 +41,15 @@ export default function VerifyEmail() {
   const { mutate: verifyEmail, isPending } = useMutation({
     mutationFn: verifyEmailAction,
     onSuccess: (e) => {
-      toast.success("Success", {
-        description: "Your email successfully verified, please login now",
-        icon: "🎉",
-      });
-      router.replace("/agency/sign-in");
-    },
-    onError: (e) => {
-      toast.error("Error", { description: e.message, icon: "🛑" });
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
+        toast.success("Success", {
+          description: "Your email successfully verified, please login now",
+          icon: "🎉",
+        });
+        router.replace("/agency/sign-in");
+      }
     },
   });
 

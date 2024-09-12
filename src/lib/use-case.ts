@@ -5,7 +5,7 @@ import packDataByDate from "./packDataByDate";
 import { Schema } from "zod";
 import jwt from "jsonwebtoken";
 import { PublicError } from "./errors";
-import { HistoryState } from "@/providers/editor/editor-types";
+import { HistoryState } from "@/stores/editor-store/editor-type";
 
 export async function hashPassword(
   plainTextPassword: string,

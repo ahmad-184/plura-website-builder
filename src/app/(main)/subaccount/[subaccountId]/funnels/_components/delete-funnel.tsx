@@ -39,7 +39,9 @@ export default function DeleteFunnel({
   const { mutate: deleteFunnel, isPending } = useMutation({
     mutationFn: deleteFunnelAction,
     onSuccess: (e) => {
-      if (e) {
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
         toast.success("Success", {
           description: "Funnel deleted successfully",
           icon: "🎉",
@@ -48,9 +50,6 @@ export default function DeleteFunnel({
         router.refresh();
         setOpen(false);
       }
-    },
-    onError: (e) => {
-      toast.error("Error", { description: e.message, icon: "🛑" });
     },
     retry: 3,
   });

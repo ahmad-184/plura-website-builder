@@ -1,8 +1,7 @@
 "use client";
 
-import { deleteFunnelAction, deleteFunnelPageAction } from "@/actions";
+import { deleteFunnelPageAction } from "@/actions";
 import ButtonWithLoaderAndProgress from "@/components/ButtonWithLoaderAndProgress";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -13,14 +12,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useMutation } from "@tanstack/react-query";
-import { OctagonAlert, Trash2Icon } from "lucide-react";
+import { Trash2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -40,7 +38,9 @@ export default function DeleteFunnelPage({
   const { mutate: deleteFunnelPage, isPending } = useMutation({
     mutationFn: deleteFunnelPageAction,
     onSuccess: (e) => {
-      if (e) {
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
         toast.success("Success", {
           description: "Page deleted successfully",
           icon: "🎉",
@@ -49,9 +49,6 @@ export default function DeleteFunnelPage({
         router.refresh();
         setOpen(false);
       }
-    },
-    onError: (e) => {
-      toast.error("Error", { description: e.message, icon: "🛑" });
     },
     retry: 3,
   });

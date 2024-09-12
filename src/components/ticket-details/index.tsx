@@ -158,12 +158,14 @@ export default function TicketDetails({
   const { mutate: createTicket, isPending: createTicketPending } = useMutation({
     mutationFn: createTicketAction,
     onSuccess: (e) => {
-      if (e) {
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
         toast.success("Success", {
           description: "Ticket created",
           icon: "🎉",
         });
-        if (setNewTicket) setNewTicket(e);
+        if (setNewTicket) setNewTicket(e.data);
         form.reset();
         setSelectedTags([]);
         router.refresh();
@@ -176,20 +178,19 @@ export default function TicketDetails({
         }
       }
     },
-    onError: (e) => {
-      toast.error("Error", { description: e.message, icon: "🛑" });
-    },
   });
 
   const { mutate: updateTicket, isPending: updateTicketPending } = useMutation({
     mutationFn: updateTicketAction,
     onSuccess: (e) => {
-      if (e) {
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
         toast.success("Success", {
           description: "Ticket updated",
           icon: "🎉",
         });
-        if (updateOneTicket) updateOneTicket(e);
+        if (updateOneTicket) updateOneTicket(e.data);
         router.refresh();
         if (channel) {
           channel.send({
@@ -199,9 +200,6 @@ export default function TicketDetails({
           });
         }
       }
-    },
-    onError: (e) => {
-      toast.error("Error", { description: e.message, icon: "🛑" });
     },
   });
 

@@ -8,7 +8,6 @@ import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { deleteAgencyAction } from "@/actions";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -24,15 +23,16 @@ export default function DeleteAgency({ data }: { data: Partial<Agency> }) {
 
   const { mutate: deleteAgency, isPending } = useMutation({
     mutationFn: deleteAgencyAction,
-    onSuccess: () => {
-      toast.success("Success", {
-        description: "Agency deleted successfully",
-        icon: "🎉",
-      });
-      window.location.replace("/agency");
-    },
-    onError: (e) => {
-      toast.error("Error", { description: e.message, icon: "🛑" });
+    onSuccess: (e) => {
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
+        toast.success("Success", {
+          description: "Agency deleted successfully",
+          icon: "🎉",
+        });
+        window.location.replace("/agency");
+      }
     },
   });
 

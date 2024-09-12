@@ -4,7 +4,7 @@ import { getCurrentUser } from "@/actions/auth";
 import { getFunnelPage } from "@/actions/funnel";
 import { supabase } from "@/lib/supabase";
 import { useEditor } from "@/providers/editor-store-provider";
-import { EditorElement } from "@/providers/editor/editor-types";
+import { EditorElement } from "@/stores/editor-store/editor-type";
 import { FunnelPage, User } from "@prisma/client";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import { useQuery } from "@tanstack/react-query";

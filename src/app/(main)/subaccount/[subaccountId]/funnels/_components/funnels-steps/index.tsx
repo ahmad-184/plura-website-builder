@@ -22,7 +22,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import Link from "next/link";
 import FunnelPagePlaceholder from "@/components/icons/funnel-page-placeholder";
 import {
   Tooltip,

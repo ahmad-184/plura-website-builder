@@ -40,15 +40,17 @@ const SendInvitation = () => {
 
   const { mutate: sendInvitation, isPending } = useMutation({
     mutationFn: sendInvitationAction,
-    onSuccess: () => {
-      toast.success("Success", {
-        description: "Invitation successfully send",
-        icon: "🎉",
-      });
-      form.reset();
+    onSuccess: (e) => {
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
+        toast.success("Success", {
+          description: "Invitation successfully send",
+          icon: "🎉",
+        });
+        form.reset();
+      }
     },
-    onError: (e) =>
-      toast.error("Error", { description: e.message, icon: "🛑" }),
   });
 
   const handleSubmit = async (values: sendInvitationSchemaType) => {

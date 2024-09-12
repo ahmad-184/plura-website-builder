@@ -28,7 +28,7 @@ export default function UploadImageWithPreview({
     setPreview(value);
   }, [value]);
 
-  const { files, isUploading, progress, startUpload, setFiles } = useUpload({
+  const { files, isUploading, startUpload, setFiles } = useUpload({
     max_size: maxSize,
     ref: { current: null },
   });

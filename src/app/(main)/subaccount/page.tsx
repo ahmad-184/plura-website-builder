@@ -2,11 +2,7 @@ import { verifyAndAcceptInvitationAction } from "@/actions";
 import Unauthorized from "../agency/_components/unauthorized";
 import { findASubaccountWithUserAccess } from "@/actions/user";
 import { redirect } from "next/navigation";
-import {
-  getCurrentUser,
-  protectSubaccountRoute,
-  validateUser,
-} from "@/actions/auth";
+import { validateUser } from "@/actions/auth";
 
 export const revalidate = 60;
 
@@ -19,12 +15,8 @@ export default async function page({
 
   let agencyId: string | null = null;
 
-  try {
-    const res = await verifyAndAcceptInvitationAction();
-    if (res) agencyId = res;
-  } catch (err) {
-    console.log(err);
-  }
+  const res = await verifyAndAcceptInvitationAction();
+  if (res) agencyId = res;
 
   if (!agencyId) return <Unauthorized />;
 

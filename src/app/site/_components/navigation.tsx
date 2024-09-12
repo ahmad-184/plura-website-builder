@@ -2,8 +2,6 @@ import { getCurrentUser } from "@/actions/auth";
 import AuthUserAvatar from "@/components/auth-user-avatar";
 import { ModeToggle } from "@/components/mode-toggle";
 import PluraLogo from "@/components/plura-logo";
-import UserAvatar from "@/components/user-avatar";
-import Image from "next/image";
 import Link from "next/link";
 
 export default async function Navigation() {

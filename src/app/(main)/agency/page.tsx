@@ -16,13 +16,9 @@ export default async function page({
 
   let agencyId: string | null = null;
 
-  try {
-    const res = await verifyAndAcceptInvitationAction();
-    if (res) agencyId = res;
-    else agencyId = null;
-  } catch (err) {
-    console.log(err);
-  }
+  const res = await verifyAndAcceptInvitationAction();
+  if (res) agencyId = res;
+  else agencyId = null;
 
   if (agencyId && user) {
     if (

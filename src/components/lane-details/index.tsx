@@ -53,13 +53,15 @@ const LaneDetails = ({
   const { mutate: createLane, isPending: createLanePending } = useMutation({
     mutationFn: createLaneAction,
     onSuccess: (e) => {
-      if (e) {
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
         toast.success("Success", {
           description: "New lane created",
           icon: "🎉",
         });
         if (setOpen) setOpen(false);
-        setNewLane(e);
+        setNewLane(e.data);
         router.refresh();
         form.reset({ name: "", pipelineId });
         if (channel) {
@@ -71,20 +73,19 @@ const LaneDetails = ({
         }
       }
     },
-    onError: (e) => {
-      toast.error("Error", { description: e.message, icon: "🛑" });
-    },
   });
 
   const { mutate: updateLane, isPending: updateLanePending } = useMutation({
     mutationFn: updateLaneAction,
     onSuccess: (e) => {
-      if (e) {
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
         toast.success("Success", {
           description: "Lane details updated",
           icon: "🎉",
         });
-        updateOneLane(e);
+        updateOneLane(e.data);
         router.refresh();
         if (channel) {
           channel.send({
@@ -94,9 +95,6 @@ const LaneDetails = ({
           });
         }
       }
-    },
-    onError: (e) => {
-      toast.error("Error", { description: e.message, icon: "🛑" });
     },
   });
 

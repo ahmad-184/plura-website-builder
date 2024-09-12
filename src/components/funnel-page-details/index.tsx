@@ -66,7 +66,9 @@ const FunnelPageDetails = ({
   const { mutate: createFunnelPage, isPending: createPending } = useMutation({
     mutationFn: createFunnelPageAction,
     onSuccess: (e) => {
-      if (e) {
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
         toast.success("Success", {
           description: "Page created",
           icon: "🎉",
@@ -76,15 +78,14 @@ const FunnelPageDetails = ({
         form.reset({ subaccountId, funnelId });
       }
     },
-    onError: (e) => {
-      toast.error("Error", { description: e.message, icon: "🛑" });
-    },
   });
 
   const { mutate: updateFunnelPage, isPending: updatePending } = useMutation({
     mutationFn: updateFunnelPageAction,
     onSuccess: (e) => {
-      if (e) {
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
         toast.success("Success", {
           description: "Page details updated",
           icon: "🎉",
@@ -92,25 +93,21 @@ const FunnelPageDetails = ({
         router.refresh();
       }
     },
-    onError: (e) => {
-      toast.error("Error", { description: e.message, icon: "🛑" });
-    },
   });
 
   const { mutate: createCopyFunnelPage, isPending: createCopyPending } =
     useMutation({
       mutationFn: createCopyFunnelPageAction,
       onSuccess: (e) => {
-        if (e) {
+        if (e.error)
+          return toast.error("Error", { description: e.error, icon: "🛑" });
+        if (e.data) {
           toast.success("Success", {
             description: "Page created",
             icon: "🎉",
           });
           router.refresh();
         }
-      },
-      onError: (e) => {
-        toast.error("Error", { description: e.message, icon: "🛑" });
       },
     });
 

@@ -39,7 +39,9 @@ const CreateUpdatePipeline = ({
   const { mutate: createPipeline, isPending: createLoading } = useMutation({
     mutationFn: createPipelineAction,
     onSuccess: (e) => {
-      if (e) {
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
         toast.success("Success", {
           description: "New pipeline created",
           icon: "🎉",
@@ -53,23 +55,22 @@ const CreateUpdatePipeline = ({
           });
         }
         router.refresh();
-        router.push(`/subaccount/${subaccountId}/pipelines/${e.id}`);
+        router.push(`/subaccount/${subaccountId}/pipelines/${e.data.id}`);
       }
-    },
-    onError: (e) => {
-      toast.error("Error", { description: e.message, icon: "🛑" });
     },
   });
 
   const { mutate: updatePipeline, isPending: updateLoading } = useMutation({
     mutationFn: updatePipelineAction,
     onSuccess: (e) => {
-      if (e) {
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
         toast.success("Success", {
           description: "Pipeline information updated",
           icon: "🎉",
         });
-        updateOnePipline(e);
+        updateOnePipline(e.data);
         if (setClose) setClose(false);
         if (channel) {
           channel.send({
@@ -80,9 +81,6 @@ const CreateUpdatePipeline = ({
         }
         router.refresh();
       }
-    },
-    onError: (e) => {
-      toast.error("Error", { description: e.message, icon: "🛑" });
     },
   });
 

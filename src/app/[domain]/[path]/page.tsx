@@ -1,5 +1,4 @@
 import { getDomainDetails } from "@/actions/funnel";
-import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { EditorElement } from "@/stores/editor-store/editor-type";
 import PageContent from "../_components/pgae-content";

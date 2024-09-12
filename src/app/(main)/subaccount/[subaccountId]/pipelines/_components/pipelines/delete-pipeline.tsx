@@ -36,7 +36,9 @@ export default function DeletePipeline({
   const { mutate: deletePipeline, isPending } = useMutation({
     mutationFn: deletePipelineAction,
     onSuccess: (e) => {
-      if (e) {
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
         toast.success("Success", {
           description: "Pipeline deleted successfully",
           icon: "🎉",
@@ -45,16 +47,13 @@ export default function DeletePipeline({
           channel.send({
             type: "broadcast",
             event: "pipeline:deleted",
-            payload: { pipelineId: e.id },
+            payload: { pipelineId: e.data.id },
           });
         }
         router.push(`/subaccount/${subaccountId}/pipelines`);
         router.refresh();
         setOpen(false);
       }
-    },
-    onError: (e) => {
-      toast.error("Error", { description: e.message, icon: "🛑" });
     },
     retry: 3,
   });

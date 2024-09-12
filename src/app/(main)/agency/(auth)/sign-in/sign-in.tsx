@@ -29,16 +29,15 @@ export default function SignIn() {
   const { mutate: signIn, isPending } = useMutation({
     mutationFn: signInUserAction,
     onSuccess: (e) => {
-      if (e) {
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
         toast.success("Success", {
           description: "Signed in successfully",
           icon: "🎉",
         });
         router.replace("/agency");
       }
-    },
-    onError: (e) => {
-      toast.error("Error", { description: e.message, icon: "🛑" });
     },
   });
 

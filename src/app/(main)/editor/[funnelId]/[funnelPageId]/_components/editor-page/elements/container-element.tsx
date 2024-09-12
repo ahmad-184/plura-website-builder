@@ -4,10 +4,8 @@ import { cn } from "@/lib/utils";
 import { useEditor } from "@/providers/editor-store-provider";
 import { EditorBtns, EditorElement } from "@/stores/editor-store/editor-type";
 import { Trash2Icon } from "lucide-react";
-import React, { useRef } from "react";
 import { uuid as uuid4 } from "short-uuid";
 import Recursive from "./recursive";
-import { useOnClickOutside } from "@/hooks/use-click-outside";
 
 export default function ContainerElement({
   element,

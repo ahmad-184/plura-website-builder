@@ -1,14 +1,6 @@
 "use client";
 
 import { useModal } from "@/providers/model-providers";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "../ui/dialog";
 import { Popover, PopoverContent } from "../ui/popover";
 
 interface CustomPopoverProps {
@@ -22,7 +14,6 @@ const CustomPopover: React.FC<CustomPopoverProps> = ({
   header,
   content,
   description,
-  children,
 }) => {
   const { setClose, isOpen } = useModal();
 

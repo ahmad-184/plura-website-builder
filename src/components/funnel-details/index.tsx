@@ -59,7 +59,9 @@ const FunnelDetails = ({
   const { mutate: createFunnel, isPending: createFunnelPending } = useMutation({
     mutationFn: createFunnelAction,
     onSuccess: (e) => {
-      if (e) {
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
         toast.success("Success", {
           description: "Funnel created",
           icon: "🎉",
@@ -69,24 +71,20 @@ const FunnelDetails = ({
         form.reset({ subaccountId });
       }
     },
-    onError: (e) => {
-      toast.error("Error", { description: e.message, icon: "🛑" });
-    },
   });
 
   const { mutate: updateFunnel, isPending: updateFunnelPending } = useMutation({
     mutationFn: updateFunnelAction,
     onSuccess: (e) => {
-      if (e) {
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
         toast.success("Success", {
           description: "Funnel details updated",
           icon: "🎉",
         });
         router.refresh();
       }
-    },
-    onError: (e) => {
-      toast.error("Error", { description: e.message, icon: "🛑" });
     },
   });
 

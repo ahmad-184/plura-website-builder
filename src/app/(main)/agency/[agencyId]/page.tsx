@@ -10,7 +10,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { AreaChart } from "@tremor/react";
 import {
   Contact2Icon,
   DollarSignIcon,

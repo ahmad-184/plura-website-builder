@@ -32,13 +32,15 @@ const DeleteLane = ({
   const { mutate: deleteLane, isPending } = useMutation({
     mutationFn: deleteLaneAction,
     onSuccess: (e) => {
-      if (e) {
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
         toast.success("Success", {
           description: "Lane deleted successfully",
           icon: "🎉",
         });
         setOpen(false);
-        removeOneLane(e.id);
+        removeOneLane(e.data.id);
         router.refresh();
         if (channel) {
           channel.send({
@@ -48,9 +50,6 @@ const DeleteLane = ({
           });
         }
       }
-    },
-    onError: (e) => {
-      toast.error("Error", { description: e.message, icon: "🛑" });
     },
   });
 

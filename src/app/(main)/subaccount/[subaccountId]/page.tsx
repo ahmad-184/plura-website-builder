@@ -23,7 +23,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { fDate, fDateTime } from "@/lib/formatTime";
+import { fDateTime } from "@/lib/formatTime";
 
 export const revalidate = 60;
 

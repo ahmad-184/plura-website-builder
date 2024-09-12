@@ -3,7 +3,6 @@
 import { deleteContactAction } from "@/actions";
 import ButtonWithLoaderAndProgress from "@/components/ButtonWithLoaderAndProgress";
 import ContactDetails from "@/components/contact-details";
-import CustomAlertDialog from "@/components/custom/custom-alert-dialog";
 import CustomDialog from "@/components/custom/custom-dialog";
 import {
   AlertDialog,
@@ -56,7 +55,9 @@ export default function ContactOptions({ contact }: { contact: Contact }) {
   const { mutate: deleteContact, isPending } = useMutation({
     mutationFn: deleteContactAction,
     onSuccess: (e) => {
-      if (e) {
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
         toast.success("Success", {
           description: "Contact deleted",
           icon: "🎉",
@@ -65,9 +66,6 @@ export default function ContactOptions({ contact }: { contact: Contact }) {
         setOpen(false);
         router.refresh();
       }
-    },
-    onError: (e) => {
-      toast.error("Error", { description: e.message, icon: "🛑" });
     },
     retry: 3,
   });

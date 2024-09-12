@@ -1,13 +1,13 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Prisma, User } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { getSubaccountFunnel, updateFunnelDetails } from "@/actions/funnel";
 import { ExternalLinkIcon } from "lucide-react";
 import { fDate } from "@/lib/formatTime";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { getCurrentUser } from "@/actions/auth";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";

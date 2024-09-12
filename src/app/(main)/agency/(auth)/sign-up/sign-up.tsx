@@ -31,17 +31,16 @@ export default function SignUp() {
   const { mutate: register, isPending } = useMutation({
     mutationFn: registerUserAction,
     onSuccess: (e) => {
-      if (e) {
+      if (e.error)
+        return toast.error("Error", { description: e.error, icon: "🛑" });
+      if (e.data) {
         toast.success("Success", {
           description: "Verification code sent to your email",
           icon: "🎉",
         });
-        if (window) window.localStorage.setItem("userId", e.id);
+        if (window) window.localStorage.setItem("userId", e.data.id);
         router.push("/agency/verify-email");
       }
-    },
-    onError: (e) => {
-      toast.error("Error", { description: e.message, icon: "🛑" });
     },
   });
 
